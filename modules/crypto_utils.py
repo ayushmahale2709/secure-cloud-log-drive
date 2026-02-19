@@ -8,11 +8,7 @@ KEY_FILE = "data/secret.key"
 # ---------------- KEY MANAGEMENT ----------------
 
 def load_key() -> bytes:
-    """
-    Load encryption key.
-    If key does not exist, generate and store it.
-    """
-    os.makedirs(os.path.dirname(KEY_FILE), exist_ok=True)
+    os.makedirs("data", exist_ok=True)
 
     if not os.path.exists(KEY_FILE):
         key = Fernet.generate_key()
@@ -23,6 +19,7 @@ def load_key() -> bytes:
             key = f.read()
 
     return key
+
 
 
 def get_cipher() -> Fernet:
