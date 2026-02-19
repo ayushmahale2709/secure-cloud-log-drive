@@ -78,6 +78,7 @@ def login_page():
                     st.error("Passwords do not match")
                 elif register_user(new_user, new_pass):
                     st.success("Registration successful. Please login.")
+                    st.rerun()
                 else:
                     st.error("User already exists")
 
