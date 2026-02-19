@@ -15,40 +15,32 @@ def verify_password(password: str, hashed: str) -> bool:
     return hash_password(password) == hashed
 
 
-# ---------------- USER STORAGE ----------------
+# ---------------- FILE SAFETY ----------------
 
 def ensure_user_file():
-    """
-    Ensure users.csv exists with correct headers.
-    """
-    os.makedirs(os.path.dirname(USER_DB_FILE), exist_ok=True)
+    os.makedirs("data", exist_ok=True)
 
     if not os.path.exists(USER_DB_FILE):
-        with open(USER_DB_FILE, "w", newline="") as f:
+        with open(USER_DB_FILE, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(["username", "password_hash"])
 
 
+# ---------------- USER STORAGE ----------------
+
 def load_users() -> dict:
-    """
-    Safely load users from CSV.
-    Returns: {username: password_hash}
-    """
     ensure_user_file()
     users = {}
 
-    with open(USER_DB_FILE, "r", newline="") as f:
+    with open(USER_DB_FILE, "r", newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
 
-        # Validate headers
-        if not reader.fieldnames or \
-           "username" not in reader.fieldnames or \
-           "password_hash" not in reader.fieldnames:
-            return users  # corrupted file → treat as empty
+        if not reader.fieldnames:
+            return users
 
         for row in reader:
-            username = row.get("username")
-            password_hash = row.get("password_hash")
+            username = row.get("username", "").strip().lower()
+            password_hash = row.get("password_hash", "").strip()
 
             if username and password_hash:
                 users[username] = password_hash
@@ -57,25 +49,25 @@ def load_users() -> dict:
 
 
 def register_user(username: str, password: str) -> bool:
-    """
-    Register a new user.
-    """
-    users = load_users()
+    ensure_user_file()
+    username = username.strip().lower()
 
+    users = load_users()
     if username in users:
         return False
 
-    with open(USER_DB_FILE, "a", newline="") as f:
+    # Write & flush immediately (important for Streamlit Cloud)
+    with open(USER_DB_FILE, "a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([username, hash_password(password)])
+        f.flush()
+        os.fsync(f.fileno())
 
     return True
 
 
 def authenticate_user(username: str, password: str) -> bool:
-    """
-    Authenticate existing user.
-    """
+    username = username.strip().lower()
     users = load_users()
 
     if username not in users:
