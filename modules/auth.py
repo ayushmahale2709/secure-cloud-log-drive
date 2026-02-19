@@ -2,43 +2,56 @@ import hashlib
 import csv
 import os
 
-# Path to user database
 USER_DB_FILE = "data/users.csv"
 
 
 # ---------------- PASSWORD UTILS ----------------
 
 def hash_password(password: str) -> str:
-    """Hash password using SHA-256"""
     return hashlib.sha256(password.encode()).hexdigest()
 
 
 def verify_password(password: str, hashed: str) -> bool:
-    """Verify password against stored hash"""
     return hash_password(password) == hashed
 
 
 # ---------------- USER STORAGE ----------------
 
-def load_users() -> dict:
+def ensure_user_file():
     """
-    Load users from CSV file.
-    Returns: {username: password_hash}
+    Ensure users.csv exists with correct headers.
     """
-    users = {}
+    os.makedirs(os.path.dirname(USER_DB_FILE), exist_ok=True)
 
-    # Create file if not exists
     if not os.path.exists(USER_DB_FILE):
-        os.makedirs(os.path.dirname(USER_DB_FILE), exist_ok=True)
         with open(USER_DB_FILE, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(["username", "password_hash"])
-        return users
+
+
+def load_users() -> dict:
+    """
+    Safely load users from CSV.
+    Returns: {username: password_hash}
+    """
+    ensure_user_file()
+    users = {}
 
     with open(USER_DB_FILE, "r", newline="") as f:
         reader = csv.DictReader(f)
+
+        # Validate headers
+        if not reader.fieldnames or \
+           "username" not in reader.fieldnames or \
+           "password_hash" not in reader.fieldnames:
+            return users  # corrupted file → treat as empty
+
         for row in reader:
-            users[row["username"]] = row["password_hash"]
+            username = row.get("username")
+            password_hash = row.get("password_hash")
+
+            if username and password_hash:
+                users[username] = password_hash
 
     return users
 
@@ -46,7 +59,6 @@ def load_users() -> dict:
 def register_user(username: str, password: str) -> bool:
     """
     Register a new user.
-    Returns True if success, False if user exists.
     """
     users = load_users()
 
