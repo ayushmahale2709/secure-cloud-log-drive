@@ -5,6 +5,7 @@ import graphviz
 
 # ---- Import Modules ----
 from modules.auth import authenticate_user, register_user
+
 from modules.blockchain import Blockchain
 from modules.search_index import SearchIndex
 from modules.logs import get_logs_for_user, format_log_for_display
@@ -74,9 +75,7 @@ def login_page():
             confirm = st.text_input("Confirm Password", type="password")
 
             if st.button("Register"):
-                if new_pass != confirm:
-                    st.error("Passwords do not match")
-                elif register_user(new_user, new_pass):
+                if register_user(new_user, new_pass):
                     st.success("Registration successful. Please login.")
                     st.rerun()
                 else:
