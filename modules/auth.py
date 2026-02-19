@@ -1,8 +1,27 @@
+import sqlite3
 import hashlib
-import csv
 import os
 
-USER_DB_FILE = "data/users.csv"
+DB_PATH = "data/auth.db"
+
+
+# ---------------- DB INIT ----------------
+
+def get_connection():
+    os.makedirs("data", exist_ok=True)
+    return sqlite3.connect(DB_PATH, check_same_thread=False)
+
+
+def init_auth_db():
+    conn = get_connection()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password_hash TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
 
 
 # ---------------- PASSWORD UTILS ----------------
@@ -11,66 +30,44 @@ def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 
-def verify_password(password: str, hashed: str) -> bool:
-    return hash_password(password) == hashed
-
-
-# ---------------- FILE SAFETY ----------------
-
-def ensure_user_file():
-    os.makedirs("data", exist_ok=True)
-
-    if not os.path.exists(USER_DB_FILE):
-        with open(USER_DB_FILE, "w", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
-            writer.writerow(["username", "password_hash"])
-
-
-# ---------------- USER STORAGE ----------------
-
-def load_users() -> dict:
-    ensure_user_file()
-    users = {}
-
-    with open(USER_DB_FILE, "r", newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-
-        if not reader.fieldnames:
-            return users
-
-        for row in reader:
-            username = row.get("username", "").strip().lower()
-            password_hash = row.get("password_hash", "").strip()
-
-            if username and password_hash:
-                users[username] = password_hash
-
-    return users
-
+# ---------------- AUTH LOGIC ----------------
 
 def register_user(username: str, password: str) -> bool:
-    ensure_user_file()
     username = username.strip().lower()
+    init_auth_db()
 
-    users = load_users()
-    if username in users:
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT username FROM users WHERE username=?", (username,))
+    if cur.fetchone():
+        conn.close()
         return False
 
-    # Write & flush immediately (important for Streamlit Cloud)
-    with open(USER_DB_FILE, "a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([username, hash_password(password)])
-        f.flush()
-        os.fsync(f.fileno())
-
+    cur.execute(
+        "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+        (username, hash_password(password))
+    )
+    conn.commit()
+    conn.close()
     return True
 
 
 def authenticate_user(username: str, password: str) -> bool:
     username = username.strip().lower()
-    users = load_users()
+    init_auth_db()
 
-    if username not in users:
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT password_hash FROM users WHERE username=?",
+        (username,)
+    )
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
         return False
 
-    return verify_password(password, users[username])
+    return row[0] == hash_password(password)
