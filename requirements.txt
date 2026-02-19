@@ -1,0 +1,5 @@
+streamlit
+cryptography
+scikit-learn
+numpy
+graphviz
