@@ -1,127 +1,108 @@
-/* =========================
-   GLOBAL APP STYLING
-   ========================= */
-
-body {
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: #ffffff;
+/* ===== GLOBAL ===== */
+html, body, [class*="css"] {
+    background-color: #ffffff !important;
+    color: #000000 !important;
     font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* Streamlit main container */
-.stApp {
-    background: transparent;
-}
-
-/* =========================
-   HEADINGS & TEXT
-   ========================= */
-
+/* ===== HEADINGS ===== */
 h1, h2, h3, h4, h5, h6 {
-    color: #ffffff !important;
+    color: #000000 !important;
     font-weight: 600;
 }
 
+/* ===== PARAGRAPH & TEXT ===== */
 p, span, label, div {
-    color: #e6e6e6 !important;
-    font-size: 15px;
+    color: #000000 !important;
 }
 
-/* =========================
-   SIDEBAR
-   ========================= */
-
+/* ===== SIDEBAR ===== */
 section[data-testid="stSidebar"] {
-    background: rgba(15, 32, 39, 0.95);
-    border-right: 1px solid rgba(255,255,255,0.1);
+    background-color: #f5f7fa !important;
+    border-right: 1px solid #e0e0e0;
 }
 
-section[data-testid="stSidebar"] h1,
-section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] p {
-    color: #ffffff !important;
+section[data-testid="stSidebar"] * {
+    color: #000000 !important;
 }
 
-/* =========================
-   BUTTONS
-   ========================= */
+/* ===== INPUTS ===== */
+input, textarea {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #cfcfcf !important;
+    border-radius: 6px !important;
+}
 
+/* ===== BUTTONS ===== */
 .stButton > button {
-    background: linear-gradient(90deg, #00c6ff, #0072ff);
-    color: #ffffff;
-    border-radius: 8px;
-    padding: 10px 16px;
-    border: none;
-    font-weight: 600;
-    transition: 0.3s ease;
+    background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1.2rem !important;
+    font-weight: 600 !important;
 }
 
 .stButton > button:hover {
-    background: linear-gradient(90deg, #0072ff, #00c6ff);
-    transform: scale(1.03);
+    background: linear-gradient(135deg, #1d4ed8, #1e3a8a) !important;
 }
 
-/* =========================
-   INPUTS & TEXT AREAS
-   ========================= */
-
-input, textarea {
-    background: rgba(255,255,255,0.08) !important;
-    color: #ffffff !important;
-    border-radius: 8px !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
-}
-
-/* =========================
-   TABLES
-   ========================= */
-
-table {
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
-}
-
-th, td {
-    padding: 10px;
-    color: #ffffff !important;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-/* =========================
-   METRICS
-   ========================= */
-
-[data-testid="stMetric"] {
-    background: rgba(255,255,255,0.08);
-    padding: 15px;
-    border-radius: 12px;
-}
-
-/* =========================
-   ALERTS
-   ========================= */
-
-.stAlert {
-    border-radius: 10px;
-}
-
-/* =========================
-   CODE BLOCKS
-   ========================= */
-
-pre {
-    background: rgba(0,0,0,0.4);
-    color: #00ffcc;
-    border-radius: 10px;
+/* ===== METRICS ===== */
+[data-testid="metric-container"] {
+    background-color: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
     padding: 12px;
+    border-radius: 8px;
 }
 
-/* =========================
-   GRAPH / VISUAL AREA
-   ========================= */
+/* ===== TABLE ===== */
+table {
+    background-color: #ffffff !important;
+    border-collapse: collapse;
+}
 
-svg {
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
-    padding: 10px;
+th {
+    background-color: #f1f5f9 !important;
+    color: #000000 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+td {
+    color: #000000 !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* ===== ALERTS ===== */
+.stAlert-success {
+    background-color: #ecfdf5 !important;
+    color: #065f46 !important;
+    border-left: 5px solid #10b981 !important;
+}
+
+.stAlert-error {
+    background-color: #fef2f2 !important;
+    color: #7f1d1d !important;
+    border-left: 5px solid #ef4444 !important;
+}
+
+.stAlert-warning {
+    background-color: #fffbeb !important;
+    color: #92400e !important;
+    border-left: 5px solid #f59e0b !important;
+}
+
+/* ===== CODE BLOCK ===== */
+pre, code {
+    background-color: #f8fafc !important;
+    color: #000000 !important;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+/* ===== EXPANDER ===== */
+.streamlit-expanderHeader {
+    background-color: #f1f5f9 !important;
+    color: #000000 !important;
+    border-radius: 6px;
 }
