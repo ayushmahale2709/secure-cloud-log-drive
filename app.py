@@ -56,6 +56,9 @@ def init_session():
     if "threat_level" not in st.session_state:
         st.session_state.threat_level = "LOW"
 
+    if "anomaly_hits" not in st.session_state:
+        st.session_state.anomaly_hits = 0
+
 init_session()
 
 
@@ -83,6 +86,7 @@ def login_page():
                     st.session_state.logged_in = True
                     st.session_state.username = username.strip().lower()
                     st.session_state.threat_level = "LOW"
+                    st.session_state.anomaly_hits = 0
                     st.rerun()
                 else:
                     st.error("Invalid username or password")
@@ -115,8 +119,8 @@ def dashboard():
     c3.metric("Threat Level", st.session_state.threat_level)
 
     st.markdown(
-        "✔️ Logs are encrypted, integrity is ensured using blockchain, "
-        "and abnormal user behavior is detected using Isolation Forest."
+        "✔️ Logs are encrypted, integrity is verified using blockchain, "
+        "and user behavior is monitored using Isolation Forest."
     )
 
 
@@ -177,22 +181,39 @@ def main_app():
             st.session_state.last_action_time = now
             st.session_state.search_count += 1
 
+            # Record behavior
             st.session_state.anomaly.record_activity(
                 st.session_state.search_count,
                 st.session_state.view_count,
                 gap
             )
 
+            # ML decision
             if st.session_state.anomaly.is_anomalous(
                 st.session_state.search_count,
                 st.session_state.view_count,
                 gap
             ):
+                st.session_state.anomaly_hits += 1
+            else:
+                st.session_state.anomaly_hits = max(
+                    0, st.session_state.anomaly_hits - 1
+                )
+
+            # Warning stage
+            if st.session_state.anomaly_hits == 2:
+                st.warning(
+                    "⚠️ Suspicious activity detected. Continued abnormal behavior "
+                    "may result in logout."
+                )
+
+            # Logout stage
+            if st.session_state.anomaly_hits >= 3:
                 st.session_state.threat_level = "HIGH"
 
                 st.error(
-                    "🚨 ML Security Alert: Abnormal behavior detected using "
-                    "Isolation Forest. You have been logged out."
+                    "🚨 ML Security Alert: Repeated abnormal access patterns detected. "
+                    "Session terminated for security."
                 )
 
                 st.session_state.logged_in = False
@@ -251,7 +272,6 @@ def main_app():
         st.markdown("### 📊 Threat Visualization (Dynamic)")
 
         g = graphviz.Digraph()
-
         g.node("User", "Normal User", style="filled", fillcolor="#bbf7d0")
 
         if st.session_state.threat_level == "LOW":
