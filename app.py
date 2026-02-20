@@ -5,11 +5,11 @@ import graphviz
 
 # ---- Import Modules ----
 from modules.auth import authenticate_user, register_user
-
 from modules.blockchain import Blockchain
 from modules.search_index import SearchIndex
 from modules.logs import get_logs_for_user, format_log_for_display
 from modules.anomaly import AnomalyDetector
+
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
@@ -25,32 +25,45 @@ def load_css():
 
 load_css()
 
+
 # ---------------- SESSION INIT ----------------
 def init_session():
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
+
     if "username" not in st.session_state:
         st.session_state.username = None
+
     if "blockchain" not in st.session_state:
         st.session_state.blockchain = Blockchain()
+
     if "search_index" not in st.session_state:
         st.session_state.search_index = SearchIndex()
         st.session_state.search_index.build_index(st.session_state.blockchain)
+
     if "anomaly" not in st.session_state:
         st.session_state.anomaly = AnomalyDetector()
+
     if "search_count" not in st.session_state:
         st.session_state.search_count = 0
+
     if "view_count" not in st.session_state:
         st.session_state.view_count = 0
+
     if "last_action_time" not in st.session_state:
         st.session_state.last_action_time = time.time()
 
 init_session()
 
+
 # ---------------- LOGIN UI ----------------
 def login_page():
-    st.markdown("<h1 style='text-align:center;'>🔐 Secure Cloud Log Drive</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center;'>Encrypted Storage • Blockchain Integrity • ML Security</p>", unsafe_allow_html=True)
+    st.markdown("<h1>🔐 Secure Cloud Log Drive</h1>", unsafe_allow_html=True)
+    st.markdown(
+        "<p><b>Encrypted Storage</b> • <b>Blockchain Integrity</b> • <b>ML-based Security Monitoring</b></p>",
+        unsafe_allow_html=True
+    )
+    st.markdown("---")
 
     col1, col2, col3 = st.columns([1, 2, 1])
 
@@ -64,7 +77,7 @@ def login_page():
             if st.button("Login"):
                 if authenticate_user(username, password):
                     st.session_state.logged_in = True
-                    st.session_state.username = username
+                    st.session_state.username = username.strip().lower()
                     st.rerun()
                 else:
                     st.error("Invalid username or password")
@@ -75,25 +88,40 @@ def login_page():
             confirm = st.text_input("Confirm Password", type="password")
 
             if st.button("Register"):
-                if register_user(new_user, new_pass):
+                if new_pass != confirm:
+                    st.warning("Passwords do not match")
+                elif register_user(new_user, new_pass):
                     st.success("Registration successful. Please login.")
                     st.rerun()
                 else:
                     st.error("User already exists")
 
+
 # ---------------- DASHBOARD ----------------
 def dashboard():
-    st.title(f"Welcome, {st.session_state.username}")
+    st.markdown(f"## 👋 Welcome, {st.session_state.username}")
 
     c1, c2, c3 = st.columns(3)
     c1.metric("Blockchain Height", len(st.session_state.blockchain.chain))
-    c2.metric("System Integrity", "Secure" if st.session_state.blockchain.is_chain_valid() else "Tampered")
+    c2.metric(
+        "System Integrity",
+        "Secure" if st.session_state.blockchain.is_chain_valid() else "Tampered"
+    )
     c3.metric("Current Time", datetime.now().strftime("%H:%M:%S"))
+
+    st.markdown(
+        "✔️ All logs are encrypted before storage, integrity is verified using blockchain, "
+        "and user behavior is continuously monitored using machine learning."
+    )
+
 
 # ---------------- MAIN APP ----------------
 def main_app():
-    st.sidebar.title("🔐 Secure Cloud Log Drive")
-    st.sidebar.write(f"User: **{st.session_state.username}**")
+    # ---- Sidebar ----
+    st.sidebar.markdown("## 🔐 Secure Cloud Log Drive")
+    st.sidebar.markdown("---")
+    st.sidebar.markdown(f"👤 **User:** {st.session_state.username}")
+    st.sidebar.markdown("---")
 
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
@@ -118,10 +146,11 @@ def main_app():
 
     # ---- Add Log ----
     elif menu == "Add Log":
-        st.subheader("Add Secure Log Entry")
+        st.markdown("### ➕ Add Secure Log Entry")
+
         log_data = st.text_area("Enter log details")
 
-        if st.button("Store Log Securely"):
+        if st.button("Encrypt & Store Log"):
             if log_data.strip():
                 block = st.session_state.blockchain.add_log(
                     log_data,
@@ -134,10 +163,11 @@ def main_app():
 
     # ---- Encrypted Search ----
     elif menu == "Encrypted Search":
-        st.subheader("Search Encrypted Logs")
+        st.markdown("### 🔍 Search Encrypted Logs")
+
         query = st.text_input("Enter keywords")
 
-        if st.button("Search"):
+        if st.button("Execute Secure Search"):
             now = time.time()
             gap = now - st.session_state.last_action_time
             st.session_state.last_action_time = now
@@ -168,7 +198,7 @@ def main_app():
 
     # ---- My Logs ----
     elif menu == "My Logs":
-        st.subheader("My Logs (Decrypted View)")
+        st.markdown("### 📂 My Logs (Decrypted View)")
         st.session_state.view_count += 1
 
         user_logs = get_logs_for_user(
@@ -184,7 +214,7 @@ def main_app():
 
     # ---- View Blockchain ----
     elif menu == "View Blockchain":
-        st.subheader("Blockchain Ledger")
+        st.markdown("### ⛓️ Blockchain Ledger")
 
         if st.session_state.blockchain.is_chain_valid():
             st.success("Blockchain integrity verified")
@@ -200,11 +230,12 @@ def main_app():
                 "Hash": b.hash[:12],
                 "Prev Hash": b.previous_hash[:12]
             })
+
         st.table(rows)
 
     # ---- Attack Graph ----
     elif menu == "Attack Graph":
-        st.subheader("Threat Visualization")
+        st.markdown("### 📊 Threat Visualization")
 
         g = graphviz.Digraph()
         g.edge("Normal User", "High Frequency Access")
@@ -212,6 +243,7 @@ def main_app():
         g.edge("Anomaly Detected", "Potential Data Abuse")
 
         st.graphviz_chart(g)
+
 
 # ---------------- ROUTER ----------------
 if st.session_state.logged_in:
