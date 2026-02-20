@@ -53,6 +53,9 @@ def init_session():
     if "last_action_time" not in st.session_state:
         st.session_state.last_action_time = time.time()
 
+    if "threat_level" not in st.session_state:
+        st.session_state.threat_level = "LOW"
+
 init_session()
 
 
@@ -60,7 +63,8 @@ init_session()
 def login_page():
     st.markdown("<h1>🔐 Secure Cloud Log Drive</h1>", unsafe_allow_html=True)
     st.markdown(
-        "<p><b>Encrypted Storage</b> • <b>Blockchain Integrity</b> • <b>ML-based Security Monitoring</b></p>",
+        "<p><b>Encrypted Storage</b> • <b>Blockchain Integrity</b> • "
+        "<b>ML-based Security Monitoring</b></p>",
         unsafe_allow_html=True
     )
     st.markdown("---")
@@ -78,6 +82,7 @@ def login_page():
                 if authenticate_user(username, password):
                     st.session_state.logged_in = True
                     st.session_state.username = username.strip().lower()
+                    st.session_state.threat_level = "LOW"
                     st.rerun()
                 else:
                     st.error("Invalid username or password")
@@ -107,17 +112,16 @@ def dashboard():
         "System Integrity",
         "Secure" if st.session_state.blockchain.is_chain_valid() else "Tampered"
     )
-    c3.metric("Current Time", datetime.now().strftime("%H:%M:%S"))
+    c3.metric("Threat Level", st.session_state.threat_level)
 
     st.markdown(
-        "✔️ All logs are encrypted before storage, integrity is verified using blockchain, "
-        "and user behavior is continuously monitored using machine learning."
+        "✔️ Logs are encrypted, integrity is ensured using blockchain, "
+        "and abnormal user behavior is detected using Isolation Forest."
     )
 
 
 # ---------------- MAIN APP ----------------
 def main_app():
-    # ---- Sidebar ----
     st.sidebar.markdown("## 🔐 Secure Cloud Log Drive")
     st.sidebar.markdown("---")
     st.sidebar.markdown(f"👤 **User:** {st.session_state.username}")
@@ -184,8 +188,17 @@ def main_app():
                 st.session_state.view_count,
                 gap
             ):
-                st.error("⚠️ Anomalous behavior detected (ML Alert)")
-                return
+                st.session_state.threat_level = "HIGH"
+
+                st.error(
+                    "🚨 ML Security Alert: Abnormal behavior detected using "
+                    "Isolation Forest. You have been logged out."
+                )
+
+                st.session_state.logged_in = False
+                st.session_state.username = None
+                time.sleep(1.5)
+                st.rerun()
 
             results = st.session_state.search_index.search(query)
 
@@ -233,14 +246,25 @@ def main_app():
 
         st.table(rows)
 
-    # ---- Attack Graph ----
+    # ---- Attack Graph (DYNAMIC) ----
     elif menu == "Attack Graph":
-        st.markdown("### 📊 Threat Visualization")
+        st.markdown("### 📊 Threat Visualization (Dynamic)")
 
         g = graphviz.Digraph()
-        g.edge("Normal User", "High Frequency Access")
-        g.edge("High Frequency Access", "Anomaly Detected")
-        g.edge("Anomaly Detected", "Potential Data Abuse")
+
+        g.node("User", "Normal User", style="filled", fillcolor="#bbf7d0")
+
+        if st.session_state.threat_level == "LOW":
+            g.node("State", "Normal Behavior", style="filled", fillcolor="#bbf7d0")
+            g.edge("User", "State")
+        else:
+            g.node("HF", "High Frequency Access", style="filled", fillcolor="#fed7aa")
+            g.node("AN", "Anomaly Detected", style="filled", fillcolor="#fecaca")
+            g.node("AB", "Potential Data Abuse", style="filled", fillcolor="#fca5a5")
+
+            g.edge("User", "HF")
+            g.edge("HF", "AN")
+            g.edge("AN", "AB")
 
         st.graphviz_chart(g)
 
