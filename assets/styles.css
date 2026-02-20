@@ -18,7 +18,7 @@ body {
    ========================= */
 
 h1, h2, h3, h4, h5, h6 {
-    color: #000000 !important;
+    color: #ffffff !important;
     font-weight: 600;
 }
 
@@ -39,7 +39,7 @@ section[data-testid="stSidebar"] {
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] p {
-    color: #000000 !important;
+    color: #ffffff !important;
 }
 
 /* =========================
@@ -48,7 +48,7 @@ section[data-testid="stSidebar"] p {
 
 .stButton > button {
     background: linear-gradient(90deg, #00c6ff, #0072ff);
-    color: #000000;
+    color: #ffffff;
     border-radius: 8px;
     padding: 10px 16px;
     border: none;
@@ -67,7 +67,7 @@ section[data-testid="stSidebar"] p {
 
 input, textarea {
     background: rgba(255,255,255,0.08) !important;
-    color: #000000 !important;
+    color: #ffffff !important;
     border-radius: 8px !important;
     border: 1px solid rgba(255,255,255,0.2) !important;
 }
@@ -83,7 +83,7 @@ table {
 
 th, td {
     padding: 10px;
-    color: #000000 !important;
+    color: #ffffff !important;
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
