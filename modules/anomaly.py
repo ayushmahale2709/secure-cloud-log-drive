@@ -5,7 +5,7 @@ from sklearn.ensemble import IsolationForest
 class AnomalyDetector:
     """
     ML-based anomaly detection using Isolation Forest.
-    Detects abnormal user behavior in real time.
+    Detects abnormal user behavior patterns.
     """
 
     def __init__(self):
@@ -19,8 +19,8 @@ class AnomalyDetector:
 
     def record_activity(self, search_count, view_count, time_gap):
         """
-        Record user activity as a feature vector:
-        [search frequency, log views, time gap]
+        Store user behavior as feature vector:
+        [search frequency, log view count, time gap]
         """
         feature_vector = [search_count, view_count, time_gap]
         self.data.append(feature_vector)
@@ -36,7 +36,7 @@ class AnomalyDetector:
 
     def is_anomalous(self, search_count, view_count, time_gap) -> bool:
         """
-        Predict whether the current behavior is anomalous.
+        Predict whether the behavior is anomalous.
         """
         if not self.trained:
             return False
