@@ -199,13 +199,23 @@ def main_app():
             else:
                 st.warning("Log content cannot be empty.")
 
-    # -------- USER: SEARCH --------
+    # -------- USER: SEARCH (AND / OR / NOT) --------
     elif menu == "Encrypted Search" and not st.session_state.is_admin:
-        st.markdown("### Search Logs")
-        query = st.text_input("Search keywords")
+        st.markdown("### 🔍 Search Logs")
+
+        col1, col2 = st.columns([3, 1])
+
+        with col1:
+            query = st.text_input("Search keywords")
+
+        with col2:
+            mode = st.selectbox(
+                "Search Mode",
+                ["AND", "OR", "NOT"]
+            )
 
         if st.button("Search"):
-            results = st.session_state.search_index.search(query)
+            results = st.session_state.search_index.search(query, mode)
 
             if results:
                 for idx in results:
@@ -236,8 +246,7 @@ def main_app():
     elif menu == "My Log Integrity" and not st.session_state.is_admin:
         st.markdown("### 🔗 My Log Integrity (Blockchain View)")
 
-        valid = st.session_state.blockchain.is_chain_valid()
-        if valid:
+        if st.session_state.blockchain.is_chain_valid():
             st.success("Blockchain integrity verified.")
         else:
             st.error("Blockchain integrity check failed.")
@@ -247,18 +256,15 @@ def main_app():
             st.session_state.username
         )
 
-        if not user_blocks:
-            st.info("No log entries available.")
-        else:
-            for b in user_blocks:
-                st.markdown(f"**Block #{b.index}**")
-                st.code(
-                    f"""
+        for b in user_blocks:
+            st.markdown(f"**Block #{b.index}**")
+            st.code(
+                f"""
 Timestamp: {b.timestamp}
 Hash: {b.hash[:20]}...
 Previous Hash: {b.previous_hash[:20]}...
 """
-                )
+            )
 
     # -------- ADMIN: VIEW ALL LOGS --------
     elif menu == "View All Logs" and st.session_state.is_admin:
@@ -278,8 +284,7 @@ Log: {block.data}
     elif menu == "Blockchain Ledger" and st.session_state.is_admin:
         st.markdown("### Blockchain Ledger")
 
-        valid = st.session_state.blockchain.is_chain_valid()
-        if valid:
+        if st.session_state.blockchain.is_chain_valid():
             st.success("Blockchain integrity verified.")
         else:
             st.error("Blockchain integrity compromised.")
@@ -290,8 +295,8 @@ Log: {block.data}
                 f"""
 Owner: {b.owner}
 Timestamp: {b.timestamp}
-Hash: {b.hash[:20]}...
-Previous Hash: {b.previous_hash[:20]}...
+Hash: {b.hash}
+Previous Hash: {b.previous_hash}
 """
             )
 
