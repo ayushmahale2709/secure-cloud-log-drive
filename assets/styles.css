@@ -1,185 +1,104 @@
 /* =========================================================
-   FORCE DARK THEME – ALL DEVICES, ALL BROWSERS
-   ========================================================= */
-html,
-body,
-#root,
-.stApp,
-[data-testid="stAppViewContainer"],
-[data-testid="stMain"],
-[data-testid="stHeader"],
-[data-testid="stToolbar"],
-[data-testid="stSidebar"],
-[class*="css"] {
-    background-color: #000000 !important;
-    color: #ffffff !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+   ENHANCED PRO-THEME: SMOOTH TRANSITIONS & DEPTH
+   ========================================================= 
+*/
+
+/* GLOBAL RESET & FONT SMOOTHING */
+html, body, [data-testid="stAppViewContainer"] {
+    background-color: #050505 !important;
+    color: #f8f9fa !important;
+    font-family: 'Inter', -apple-system, system-ui, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* =========================================================
-   FORCE TEXT COLOR (NO GREY / NO FADE)
-   ========================================================= */
-h1, h2, h3, h4, h5, h6,
-p, span, label, div {
-    color: #ffffff !important;
-    font-weight: 500;
-}
-
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
+/* SIDEBAR REFINEMENT */
 section[data-testid="stSidebar"] {
-    background-color: #000000 !important;
-    border-right: 1px solid #1f2937;
+    background-color: #0a0a0a !important;
+    border-right: 1px solid #1e1e1e !important;
 }
 
-section[data-testid="stSidebar"] * {
+/* =========================================================
+   INPUTS: Modern "Glass" Focus
+   ========================================================= 
+*/
+input, textarea, div[data-baseweb="select"] > div {
+    background-color: #121212 !important;
     color: #ffffff !important;
-}
-
-/* =========================================================
-   INPUTS & TEXTAREAS (APPLE STYLE)
-   ========================================================= */
-input,
-textarea {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    border: 1px solid #d1d1d6 !important;
+    border: 1px solid #2d2d2d !important;
     border-radius: 10px !important;
-    padding: 0.55rem 0.75rem !important;
-    font-size: 0.95rem;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4) !important;
+}
+
+/* High-Impact Focus State */
+input:focus, textarea:focus, div[data-baseweb="select"]:focus-within > div {
+    border-color: #0a84ff !important;
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2) !important;
+    outline: none !important;
 }
 
 /* =========================================================
-   BUTTONS
-   ========================================================= */
+   BUTTONS: Gradient & Animation
+   ========================================================= 
+*/
 .stButton > button {
-    background-color: #0a84ff !important;
-    color: #ffffff !important;
+    background: linear-gradient(135deg, #0a84ff 0%, #0056b3 100%) !important;
+    color: white !important;
     border: none !important;
-    border-radius: 10px !important;
-    padding: 0.55rem 1.3rem !important;
-    font-weight: 500 !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1.5rem !important;
+    font-weight: 600 !important;
+    transition: transform 0.1s active, opacity 0.2s !important;
+    width: 100%;
 }
 
 .stButton > button:hover {
-    background-color: #006edc !important;
+    opacity: 0.9 !important;
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3) !important;
+    transform: translateY(-1px);
+}
+
+.stButton > button:active {
+    transform: translateY(1px);
 }
 
 /* =========================================================
-   METRICS
-   ========================================================= */
+   ALERTS: Vibrant but Balanced
+   ========================================================= 
+*/
+[data-testid="stNotification"] {
+    border-radius: 12px !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    backdrop-filter: blur(10px);
+}
+
+.stAlert-success { background-color: rgba(6, 78, 59, 0.4) !important; color: #a7f3d0 !important; border-left: 5px solid #10b981 !important; }
+.stAlert-error { background-color: rgba(127, 29, 29, 0.4) !important; color: #fecaca !important; border-left: 5px solid #ef4444 !important; }
+.stAlert-warning { background-color: rgba(120, 53, 15, 0.4) !important; color: #fde68a !important; border-left: 5px solid #f59e0b !important; }
+
+/* =========================================================
+   METRICS & CARDS
+   ========================================================= 
+*/
 [data-testid="metric-container"] {
-    background-color: #111111 !important;
-    border: 1px solid #1f2937 !important;
-    border-radius: 14px;
-    padding: 14px;
-    color: #ffffff !important;
+    background-color: #0f0f0f !important;
+    border: 1px solid #1e1e1e !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: #0a84ff !important;
+    font-weight: 700 !important;
 }
 
 /* =========================================================
-   TABLES
-   ========================================================= */
-table {
-    background-color: #111111 !important;
-    border-collapse: collapse;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-th {
-    background-color: #1f2937 !important;
-    color: #ffffff !important;
-    border-bottom: 1px solid #374151 !important;
-    font-weight: 500;
-}
-
-td {
-    color: #e5e7eb !important;
-    border-bottom: 1px solid #1f2937 !important;
-}
-
-/* =========================================================
-   ALERTS
-   ========================================================= */
-.stAlert-success {
-    background-color: #022c22 !important;
-    color: #d1fae5 !important;
-    border-left: 4px solid #10b981 !important;
-}
-
-.stAlert-error {
-    background-color: #3f0d0d !important;
-    color: #fee2e2 !important;
-    border-left: 4px solid #ef4444 !important;
-}
-
-.stAlert-warning {
-    background-color: #3b2f0b !important;
-    color: #fef3c7 !important;
-    border-left: 4px solid #f59e0b !important;
-}
-
-/* =========================================================
-   CODE BLOCKS
-   ========================================================= */
-pre,
-code {
-    background-color: #111111 !important;
-    color: #ffffff !important;
-    border: 1px solid #1f2937;
-    border-radius: 10px;
-}
-
-/* =========================================================
-   EXPANDERS
-   ========================================================= */
-.streamlit-expanderHeader {
-    background-color: #111111 !important;
-    color: #ffffff !important;
-    border-radius: 12px;
-}
-
-/* =========================================================
-   SELECTBOX (AND / OR / NOT) – CLEAN, NO SPLIT
-   ========================================================= */
-div[data-baseweb="select"] {
-    background-color: transparent !important;
-}
-
-div[data-baseweb="select"] > div {
-    background-color: #ffffff !important;
-    border: 1px solid #d1d1d6 !important;
+   DATA TABLES (STREAMLIT DATAFRAME)
+   ========================================================= 
+*/
+[data-testid="stTable"] {
     border-radius: 12px !important;
-    box-shadow: none !important;
-}
-
-/* REMOVE INTERNAL DIVIDER */
-div[data-baseweb="select"] div[aria-hidden="true"] {
-    display: none !important;
-}
-
-div[data-baseweb="select"] div[role="button"] {
-    background-color: #ffffff !important;
-    border-radius: 12px !important;
-}
-
-div[data-baseweb="select"] span {
-    color: #000000 !important;
-    font-weight: 500;
-}
-
-/* DROPDOWN MENU */
-div[data-baseweb="popover"] {
-    border-radius: 14px !important;
     overflow: hidden !important;
-}
-
-div[data-baseweb="option"] {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-}
-
-div[data-baseweb="option"]:hover {
-    background-color: #f2f2f7 !important;
+    border: 1px solid #1e1e1e !important;
 }
