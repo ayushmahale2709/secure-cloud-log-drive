@@ -3,15 +3,11 @@ import time
 from datetime import datetime
 import graphviz
 
-# -------------------------------
-# Project: Secure Cloud Log Drive
-# Note:
-# This is an academic prototype to demonstrate
-# secure log storage, integrity checking, and
-# behavior-based monitoring.
-# -------------------------------
+# =========================================================
+# Secure Cloud Log Drive
+# Academic Prototype for Secure Log Storage and Monitoring
+# =========================================================
 
-# ---- Import Internal Modules ----
 from modules.auth import authenticate_user, register_user
 from modules.blockchain import Blockchain
 from modules.search_index import SearchIndex
@@ -19,32 +15,24 @@ from modules.logs import get_logs_for_user, format_log_for_display
 from modules.anomaly import AnomalyDetector
 
 
-# ---------------- PAGE CONFIG ----------------
+# ---------------- PAGE CONFIGURATION ----------------
 st.set_page_config(
     page_title="Secure Cloud Log Drive",
     page_icon="🔐",
     layout="wide"
 )
 
-# ---------------- LOAD CUSTOM STYLES ----------------
+
+# ---------------- LOAD STYLES ----------------
 def load_css():
-    """
-    Loads external CSS for UI styling.
-    Styling is kept separate for cleaner code.
-    """
     with open("assets/styles.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 load_css()
 
 
-# ---------------- SESSION INITIALIZATION ----------------
+# ---------------- SESSION STATE SETUP ----------------
 def init_session():
-    """
-    Initialize all required session variables.
-    This avoids unexpected KeyErrors during runtime.
-    """
-
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
 
@@ -84,66 +72,68 @@ def init_session():
 init_session()
 
 
-# ---------------- SECURITY STATUS BANNER ----------------
+# ---------------- SECURITY STATUS ----------------
 def security_banner():
-    """
-    Displays a simple security status message
-    based on current session behavior.
-    """
-
     if st.session_state.threat_level == "LOW":
-        st.success("System status looks normal")
+        st.success("System operating within normal parameters.")
     elif st.session_state.threat_level == "MEDIUM":
-        st.warning("Unusual activity detected in this session")
+        st.warning("Unusual access behavior has been observed.")
     else:
-        st.error("High-risk behavior detected. Session restricted")
+        st.error(
+            "Repeated abnormal access patterns detected. "
+            "This session has been terminated for security reasons."
+        )
 
 
-# ---------------- LOGIN & REGISTRATION ----------------
+# ---------------- AUTHENTICATION ----------------
 def login_page():
-    st.markdown("## 🔐 Secure Cloud Log Drive")
+    st.markdown("## Secure Cloud Log Drive")
     st.markdown(
-        "Encrypted log storage with integrity verification "
-        "and basic behavior monitoring."
+        "A prototype system for secure log storage, integrity verification, "
+        "and access monitoring."
     )
     st.markdown("---")
 
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        login_tab, register_tab = st.tabs(["Login", "Register"])
+        login_tab, register_tab = st.tabs(["Sign In", "Register"])
 
-        # ---- Login ----
+        # ---- Sign In ----
         with login_tab:
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
 
-            if st.button("Login"):
+            if st.button("Sign In"):
                 if authenticate_user(username, password):
                     st.session_state.logged_in = True
                     st.session_state.username = username.strip().lower()
-
                     st.session_state.activity_log.append(
-                        f"{datetime.now()} - User logged in"
+                        f"{datetime.now()} - User authenticated"
                     )
-
                     st.rerun()
                 else:
-                    st.error("Login failed. Please check credentials.")
+                    st.error(
+                        "Authentication failed. Please verify your credentials."
+                    )
 
-        # ---- Registration ----
+        # ---- Register ----
         with register_tab:
             new_user = st.text_input("New Username")
             new_pass = st.text_input("New Password", type="password")
             confirm = st.text_input("Confirm Password", type="password")
 
-            if st.button("Register"):
+            if st.button("Create Account"):
                 if new_pass != confirm:
-                    st.warning("Passwords do not match")
+                    st.warning("The passwords entered do not match.")
                 elif register_user(new_user, new_pass):
-                    st.success("User registered successfully. Please login.")
+                    st.success(
+                        "Account created successfully. You may now sign in."
+                    )
                 else:
-                    st.error("This username already exists")
+                    st.error(
+                        "The requested username is already in use."
+                    )
 
 
 # ---------------- DASHBOARD ----------------
@@ -153,33 +143,40 @@ def dashboard():
     st.markdown(f"### Welcome, **{st.session_state.username}**")
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Total Blocks", len(st.session_state.blockchain.chain))
-    c2.metric(
-        "Chain Status",
-        "Valid" if st.session_state.blockchain.is_chain_valid() else "Broken"
+    c1.metric(
+        "Stored Blocks",
+        len(st.session_state.blockchain.chain)
     )
-    c3.metric("Threat Level", st.session_state.threat_level)
+    c2.metric(
+        "Integrity Status",
+        "Valid" if st.session_state.blockchain.is_chain_valid() else "Compromised"
+    )
+    c3.metric(
+        "Session Risk Level",
+        st.session_state.threat_level
+    )
 
     risk_score = min(100, st.session_state.anomaly_hits * 33)
-    st.progress(risk_score, text=f"Risk estimate: {risk_score}%")
+    st.progress(risk_score, text=f"Estimated risk level: {risk_score}%")
 
-    with st.expander("ℹ️ System Notes"):
+    with st.expander("System Scope and Assumptions"):
         st.write("""
-        • Logs are encrypted before storage  
-        • Blockchain is maintained in-memory  
-        • Behavior analysis is session-based  
-        """)
+- Logs are encrypted prior to storage  
+- Integrity is verified using a blockchain-style ledger  
+- Behavior analysis is performed at session level  
+- This system is intended for academic demonstration purposes  
+""")
 
 
 # ---------------- MAIN APPLICATION ----------------
 def main_app():
     st.sidebar.markdown("## Secure Cloud Log Drive")
-    st.sidebar.markdown(f"User: **{st.session_state.username}**")
+    st.sidebar.markdown(f"Signed in as: **{st.session_state.username}**")
 
     if st.session_state.username == "admin":
         st.sidebar.markdown("Role: Administrator")
 
-    if st.sidebar.button("Logout"):
+    if st.sidebar.button("Sign Out"):
         st.session_state.logged_in = False
         st.session_state.username = None
         st.rerun()
@@ -188,12 +185,12 @@ def main_app():
         "Navigation",
         [
             "Dashboard",
-            "Add Log",
+            "Create Log Entry",
             "Search Logs",
             "My Logs",
-            "Blockchain View",
+            "Integrity Ledger",
             "Access Pattern View",
-            "Audit Timeline"
+            "Session Activity Log"
         ]
     )
 
@@ -201,10 +198,10 @@ def main_app():
     if menu == "Dashboard":
         dashboard()
 
-    # ---- Add Log ----
-    elif menu == "Add Log":
-        st.markdown("### Add a new log entry")
-        log_data = st.text_area("Log content")
+    # ---- Create Log Entry ----
+    elif menu == "Create Log Entry":
+        st.markdown("### Create Log Entry")
+        log_data = st.text_area("Log details")
 
         if st.button("Store Log"):
             if log_data.strip():
@@ -219,29 +216,35 @@ def main_app():
                 )
 
                 st.session_state.activity_log.append(
-                    f"{datetime.now()} - Log added (Block {block.index})"
+                    f"{datetime.now()} - Log stored (Block {block.index})"
                 )
 
-                st.success(f"Log saved successfully (Block {block.index})")
+                st.success(
+                    f"Log entry stored successfully. "
+                    f"Reference Block: {block.index}"
+                )
             else:
-                st.warning("Log content cannot be empty")
+                st.warning("Log content must not be empty.")
 
     # ---- Search Logs ----
     elif menu == "Search Logs":
-        st.markdown("### Search encrypted logs")
-        query = st.text_input("Search keywords")
+        st.markdown("### Search Stored Logs")
+        query = st.text_input("Search criteria")
 
-        if st.button("Search"):
+        if st.button("Execute Search"):
             now = time.time()
             gap = now - st.session_state.last_action_time
             st.session_state.last_action_time = now
             st.session_state.search_count += 1
 
-            # Simple rule-based check
+            # Rule-based observation
             if st.session_state.search_count > 10:
-                st.warning("High number of searches detected")
+                st.warning(
+                    "Elevated search frequency detected "
+                    "within a short time window."
+                )
 
-            # Record activity for ML
+            # Record behavior
             st.session_state.anomaly.record_activity(
                 st.session_state.search_count,
                 st.session_state.view_count,
@@ -256,10 +259,10 @@ def main_app():
 
             st.info(
                 f"""
-Decision factors:
-- Searches: {st.session_state.search_count}
-- Views: {st.session_state.view_count}
-- Time gap: {round(gap, 2)} seconds
+Access pattern indicators:
+- Search count: {st.session_state.search_count}
+- View count: {st.session_state.view_count}
+- Time since last action: {round(gap, 2)} seconds
 """
             )
 
@@ -269,7 +272,13 @@ Decision factors:
 
             if st.session_state.anomaly_hits >= 3:
                 st.session_state.threat_level = "HIGH"
-                st.error("Session ended due to repeated abnormal activity")
+                st.session_state.activity_log.append(
+                    f"{datetime.now()} - Session terminated due to risk"
+                )
+                st.error(
+                    "Repeated abnormal access patterns were detected. "
+                    "The session has been terminated as a precaution."
+                )
                 st.session_state.logged_in = False
                 time.sleep(1)
                 st.rerun()
@@ -281,20 +290,22 @@ Decision factors:
                     block = st.session_state.blockchain.chain[idx]
                     st.code(
                         f"""
-Block: {block.index}
-Time: {block.timestamp}
+Block ID: {block.index}
+Timestamp: {block.timestamp}
 Hash: {block.hash}
-Previous: {block.previous_hash}
+Previous Hash: {block.previous_hash}
 Data: {block.data}
-Integrity OK: {st.session_state.blockchain.is_chain_valid()}
+Integrity Verified: {st.session_state.blockchain.is_chain_valid()}
 """
                     )
             else:
-                st.info("No logs matched your search")
+                st.info(
+                    "No records matched the current search criteria."
+                )
 
     # ---- My Logs ----
     elif menu == "My Logs":
-        st.markdown("### My stored logs")
+        st.markdown("### My Stored Logs")
         st.session_state.view_count += 1
 
         logs = get_logs_for_user(
@@ -303,14 +314,14 @@ Integrity OK: {st.session_state.blockchain.is_chain_valid()}
         )
 
         if not logs:
-            st.info("No logs found for this account")
+            st.info("No log entries are associated with this account.")
         else:
             for block in logs:
                 st.code(format_log_for_display(block))
 
-    # ---- Blockchain View ----
-    elif menu == "Blockchain View":
-        st.markdown("### Blockchain ledger")
+    # ---- Integrity Ledger ----
+    elif menu == "Integrity Ledger":
+        st.markdown("### Integrity Ledger")
 
         rows = []
         for b in st.session_state.blockchain.chain:
@@ -319,39 +330,39 @@ Integrity OK: {st.session_state.blockchain.is_chain_valid()}
                 "Owner": b.owner,
                 "Timestamp": b.timestamp,
                 "Hash": b.hash[:12],
-                "Prev Hash": b.previous_hash[:12]
+                "Previous Hash": b.previous_hash[:12]
             })
 
         st.table(rows)
 
-    # ---- Access Pattern ----
+    # ---- Access Pattern View ----
     elif menu == "Access Pattern View":
-        st.markdown("### Access behavior visualization")
+        st.markdown("### Access Pattern Overview")
 
         g = graphviz.Digraph()
-        g.node("User", "User Session")
+        g.node("Session", "User Session")
 
         if st.session_state.threat_level == "LOW":
-            g.node("Normal", "Normal Usage")
-            g.edge("User", "Normal")
+            g.node("Normal", "Normal Activity")
+            g.edge("Session", "Normal")
         else:
-            g.node("Anomaly", "Anomalous Pattern")
-            g.node("Risk", "Potential Abuse")
-            g.edge("User", "Anomaly")
-            g.edge("Anomaly", "Risk")
+            g.node("Observed", "Anomalous Activity")
+            g.node("Risk", "Potential Risk")
+            g.edge("Session", "Observed")
+            g.edge("Observed", "Risk")
 
         st.graphviz_chart(g)
 
-    # ---- Audit Timeline ----
-    elif menu == "Audit Timeline":
-        st.markdown("### Session audit timeline")
+    # ---- Session Activity Log ----
+    elif menu == "Session Activity Log":
+        st.markdown("### Session Activity Log")
 
         st.code("\n".join(st.session_state.activity_log[-20:]))
 
         st.download_button(
-            "Download audit log",
+            "Export activity log",
             data="\n".join(st.session_state.activity_log),
-            file_name="audit_log.txt"
+            file_name="session_activity_log.txt"
         )
 
 
