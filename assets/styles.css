@@ -1,29 +1,47 @@
-
-html, body, [class*="css"] {
-    background-color: #0b0f14 !important; /* Apple-like charcoal */
-    color: #f5f5f7 !important;           /* Apple white */
+/* =========================================================
+   FORCE DARK THEME – ALL DEVICES, ALL BROWSERS
+   ========================================================= */
+html,
+body,
+#root,
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+[data-testid="stHeader"],
+[data-testid="stToolbar"],
+[data-testid="stSidebar"],
+[class*="css"] {
+    background-color: #000000 !important;
+    color: #ffffff !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* ===== HEADINGS & TEXT ===== */
+/* =========================================================
+   FORCE TEXT COLOR (NO GREY / NO FADE)
+   ========================================================= */
 h1, h2, h3, h4, h5, h6,
-p, span, label {
-    color: #f5f5f7 !important;
+p, span, label, div {
+    color: #ffffff !important;
     font-weight: 500;
 }
 
-/* ===== SIDEBAR ===== */
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
 section[data-testid="stSidebar"] {
-    background-color: #111827 !important;
+    background-color: #000000 !important;
     border-right: 1px solid #1f2937;
 }
 
 section[data-testid="stSidebar"] * {
-    color: #f5f5f7 !important;
+    color: #ffffff !important;
 }
 
-/* ===== INPUTS (APPLE STYLE) ===== */
-input, textarea {
+/* =========================================================
+   INPUTS & TEXTAREAS (APPLE STYLE)
+   ========================================================= */
+input,
+textarea {
     background-color: #ffffff !important;
     color: #000000 !important;
     border: 1px solid #d1d1d6 !important;
@@ -32,9 +50,11 @@ input, textarea {
     font-size: 0.95rem;
 }
 
-/* ===== BUTTONS ===== */
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 .stButton > button {
-    background-color: #0a84ff !important; /* Apple blue */
+    background-color: #0a84ff !important;
     color: #ffffff !important;
     border: none !important;
     border-radius: 10px !important;
@@ -46,18 +66,22 @@ input, textarea {
     background-color: #006edc !important;
 }
 
-/* ===== METRICS ===== */
+/* =========================================================
+   METRICS
+   ========================================================= */
 [data-testid="metric-container"] {
-    background-color: #111827 !important;
+    background-color: #111111 !important;
     border: 1px solid #1f2937 !important;
     border-radius: 14px;
     padding: 14px;
-    color: #f5f5f7 !important;
+    color: #ffffff !important;
 }
 
-/* ===== TABLE ===== */
+/* =========================================================
+   TABLES
+   ========================================================= */
 table {
-    background-color: #111827 !important;
+    background-color: #111111 !important;
     border-collapse: collapse;
     border-radius: 12px;
     overflow: hidden;
@@ -65,7 +89,7 @@ table {
 
 th {
     background-color: #1f2937 !important;
-    color: #f5f5f7 !important;
+    color: #ffffff !important;
     border-bottom: 1px solid #374151 !important;
     font-weight: 500;
 }
@@ -75,7 +99,9 @@ td {
     border-bottom: 1px solid #1f2937 !important;
 }
 
-/* ===== ALERTS ===== */
+/* =========================================================
+   ALERTS
+   ========================================================= */
 .stAlert-success {
     background-color: #022c22 !important;
     color: #d1fae5 !important;
@@ -94,22 +120,29 @@ td {
     border-left: 4px solid #f59e0b !important;
 }
 
-/* ===== CODE BLOCK ===== */
-pre, code {
-    background-color: #111827 !important;
-    color: #e5e7eb !important;
+/* =========================================================
+   CODE BLOCKS
+   ========================================================= */
+pre,
+code {
+    background-color: #111111 !important;
+    color: #ffffff !important;
     border: 1px solid #1f2937;
     border-radius: 10px;
 }
 
-/* ===== EXPANDER ===== */
+/* =========================================================
+   EXPANDERS
+   ========================================================= */
 .streamlit-expanderHeader {
-    background-color: #111827 !important;
-    color: #f5f5f7 !important;
+    background-color: #111111 !important;
+    color: #ffffff !important;
     border-radius: 12px;
 }
 
-/* ===== FIXED SEARCH MODE DROPDOWN ===== */
+/* =========================================================
+   SELECTBOX (AND / OR / NOT) – CLEAN, NO SPLIT
+   ========================================================= */
 div[data-baseweb="select"] {
     background-color: transparent !important;
 }
@@ -121,66 +154,22 @@ div[data-baseweb="select"] > div {
     box-shadow: none !important;
 }
 
-div[data-baseweb="select"] div {
-    background-color: transparent !important;
-}
-
-div[data-baseweb="select"] span {
-    color: #000000 !important;
-    font-weight: 500;
-}
-
-/* Remove inner split background */
-div[data-baseweb="select"] div[role="button"] {
-    background-color: #ffffff !important;
-    border-radius: 12px !important;
-}
-
-/* Dropdown menu styling */
-div[data-baseweb="popover"] {
-    border-radius: 14px !important;
-    overflow: hidden !important;
-}
-
-div[data-baseweb="option"] {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-}
-
-div[data-baseweb="option"]:hover {
-    background-color: #f2f2f7 !important;
-}
-
-/* ===== FIX SELECTBOX INNER DIVIDER ===== */
-div[data-baseweb="select"] {
-    background-color: transparent !important;
-}
-
-div[data-baseweb="select"] > div {
-    background-color: #ffffff !important;
-    border: 1px solid #d1d1d6 !important;
-    border-radius: 12px !important;
-    box-shadow: none !important;
-}
-
-/* REMOVE the vertical divider */
+/* REMOVE INTERNAL DIVIDER */
 div[data-baseweb="select"] div[aria-hidden="true"] {
     display: none !important;
 }
 
-/* Arrow button */
 div[data-baseweb="select"] div[role="button"] {
     background-color: #ffffff !important;
     border-radius: 12px !important;
 }
 
-/* Text */
 div[data-baseweb="select"] span {
     color: #000000 !important;
     font-weight: 500;
 }
 
-/* Dropdown menu */
+/* DROPDOWN MENU */
 div[data-baseweb="popover"] {
     border-radius: 14px !important;
     overflow: hidden !important;
