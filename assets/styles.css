@@ -1,92 +1,204 @@
 /* =========================================================
-   OLED BLACK & SNOW WHITE – HIGH CONTRAST THEME
-   ========================================================= 
-*/
-
-/* 1. GLOBAL TEXT & BACKGROUND */
-html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-    background-color: #000000 !important;
-    color: #FFFFFF !important;
+   GLOBAL THEME – PROFESSIONAL DARK (NOT PURE BLACK)
+   ========================================================= */
+html,
+body,
+#root,
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+[data-testid="stHeader"],
+[data-testid="stToolbar"],
+[data-testid="stSidebar"],
+[class*="css"] {
+    background-color: #0f172a !important;   /* deep slate blue */
+    color: #f8fafc !important;              /* soft white */
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-/* Force every possible text element to Pure White */
-h1, h2, h3, h4, h5, h6, p, span, label, div, li {
-    color: #FFFFFF !important;
-    font-weight: 500 !important;
-    -webkit-font-smoothing: antialiased;
+/* =========================================================
+   TEXT – FORCE READABILITY
+   ========================================================= */
+h1, h2, h3, h4, h5, h6 {
+    color: #f8fafc !important;
+    font-weight: 600;
 }
 
-/* 2. INPUTS & SELECTBOXES (High Visibility) */
-/* We use a very dark grey for the box so white text "pops" */
-input, textarea, [data-baseweb="select"] > div {
-    background-color: #161616 !important;
-    color: #FFFFFF !important;
-    border: 2px solid #333333 !important; /* Thicker border for clarity */
-    border-radius: 10px !important;
+p, span, label, div {
+    color: #e5e7eb !important;
+    font-weight: 400;
 }
 
-/* High-Contrast Focus State */
-input:focus, [data-baseweb="select"]:focus-within > div {
-    border-color: #007AFF !important; /* iOS Blue */
-    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.5) !important;
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+section[data-testid="stSidebar"] {
+    background-color: #020617 !important;
+    border-right: 1px solid #1e293b;
 }
 
-/* 3. BUTTONS (Action Blue) */
+section[data-testid="stSidebar"] * {
+    color: #e5e7eb !important;
+}
+
+/* =========================================================
+   INPUTS & TEXTAREAS (BLACK TEXT INSIDE)
+   ========================================================= */
+input,
+textarea {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 0.75rem !important;
+    font-size: 0.95rem;
+}
+
+input:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.25);
+}
+
+/* =========================================================
+   BUTTONS – MODERN ENTERPRISE STYLE
+   ========================================================= */
 .stButton > button {
-    background-color: #007AFF !important;
-    color: #FFFFFF !important;
-    border-radius: 10px !important;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    color: #ffffff !important;
     border: none !important;
-    padding: 0.7rem 2rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    width: 100%;
-    transition: all 0.2s ease;
+    border-radius: 8px !important;
+    padding: 0.6rem 1.4rem !important;
+    font-weight: 600 !important;
+    transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .stButton > button:hover {
-    background-color: #0056b3 !important;
+    background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
     transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4) !important;
 }
 
-/* 4. METRICS & CARDS */
+.stButton > button:active {
+    transform: translateY(0);
+}
+
+/* =========================================================
+   METRICS / CARDS
+   ========================================================= */
 [data-testid="metric-container"] {
-    background-color: #0c0c0c !important;
-    border: 1px solid #222222 !important;
-    border-left: 5px solid #007AFF !important; /* Visual accent */
-    border-radius: 12px !important;
-    padding: 1.5rem !important;
+    background-color: #020617 !important;
+    border: 1px solid #1e293b !important;
+    border-radius: 12px;
+    padding: 16px;
+    color: #f8fafc !important;
 }
 
-[data-testid="stMetricLabel"] {
-    color: #AAAAAA !important; /* Slightly dimmer to make value pop */
+/* =========================================================
+   TABLES
+   ========================================================= */
+table {
+    background-color: #020617 !important;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-[data-testid="stMetricValue"] {
-    color: #FFFFFF !important;
-    font-size: 2rem !important;
+th {
+    background-color: #020617 !important;
+    color: #f8fafc !important;
+    border-bottom: 1px solid #1e293b !important;
+    font-weight: 600;
 }
 
-/* 5. ALERTS (Clear & Bold) */
-.stAlert {
-    border-radius: 12px !important;
-    border: none !important;
+td {
+    color: #e5e7eb !important;
+    border-bottom: 1px solid #1e293b !important;
 }
 
-.stAlert p {
-    color: #FFFFFF !important; /* Ensures alert text is white */
-    font-weight: 600 !important;
+/* =========================================================
+   ALERTS – CLEAR & PROFESSIONAL
+   ========================================================= */
+.stAlert-success {
+    background-color: #052e16 !important;
+    color: #dcfce7 !important;
+    border-left: 4px solid #22c55e !important;
 }
 
-/* Success = Emerald, Error = Crimson, Warning = Amber */
-.stAlert-success { background-color: #064e3b !important; border-bottom: 4px solid #10b981 !important; }
-.stAlert-error { background-color: #7f1d1d !important; border-bottom: 4px solid #ef4444 !important; }
-.stAlert-warning { background-color: #78350f !important; border-bottom: 4px solid #f59e0b !important; }
+.stAlert-error {
+    background-color: #3f0d0d !important;
+    color: #fee2e2 !important;
+    border-left: 4px solid #ef4444 !important;
+}
 
-/* 6. SIDEBAR CUSTOMIZATION */
-[data-testid="stSidebar"] {
-    background-color: #050505 !important;
-    border-right: 1px solid #222222 !important;
+.stAlert-warning {
+    background-color: #3b2f0b !important;
+    color: #fef3c7 !important;
+    border-left: 4px solid #f59e0b !important;
+}
+
+/* =========================================================
+   CODE BLOCKS
+   ========================================================= */
+pre,
+code {
+    background-color: #020617 !important;
+    color: #e5e7eb !important;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+}
+
+/* =========================================================
+   EXPANDERS
+   ========================================================= */
+.streamlit-expanderHeader {
+    background-color: #020617 !important;
+    color: #f8fafc !important;
+    border-radius: 10px;
+}
+
+/* =========================================================
+   SELECTBOX / DROPDOWN (BLACK TEXT, CLEAN)
+   ========================================================= */
+div[data-baseweb="select"] {
+    background-color: transparent !important;
+}
+
+div[data-baseweb="select"] > div {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+/* Remove internal divider */
+div[data-baseweb="select"] div[aria-hidden="true"] {
+    display: none !important;
+}
+
+/* Dropdown button */
+div[data-baseweb="select"] div[role="button"] {
+    background-color: #ffffff !important;
+    border-radius: 8px !important;
+}
+
+/* Dropdown text */
+div[data-baseweb="select"] span {
+    color: #000000 !important;
+    font-weight: 500;
+}
+
+/* Dropdown menu */
+div[data-baseweb="popover"] {
+    border-radius: 10px !important;
+    overflow: hidden !important;
+}
+
+div[data-baseweb="option"] {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+div[data-baseweb="option"]:hover {
+    background-color: #e5e7eb !important;
 }
