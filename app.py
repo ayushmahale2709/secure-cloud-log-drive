@@ -52,6 +52,14 @@ def init_session():
 init_session()
 
 
+# ---------------- HELPERS ----------------
+def get_block_by_index(chain, block_index):
+    for block in chain:
+        if block.index == block_index:
+            return block
+    return None
+
+
 # ---------------- SECURITY BANNER ----------------
 def security_banner():
     if st.session_state.threat_level == "LOW":
@@ -92,7 +100,7 @@ def login_page():
                     )
                     st.rerun()
                 else:
-                    st.error("Authentication failed. Please check credentials.")
+                    st.error("Authentication failed.")
 
         with tab2:
             new_user = st.text_input("New Username")
@@ -103,7 +111,7 @@ def login_page():
                 if new_pass != confirm:
                     st.warning("Passwords do not match.")
                 elif register_user(new_user, new_pass):
-                    st.success("Account created successfully. You may now sign in.")
+                    st.success("Account created successfully. Please sign in.")
                 else:
                     st.error("Username already exists.")
 
@@ -216,19 +224,15 @@ def main_app():
                 st.session_state.anomaly_hits += 1
                 st.session_state.threat_level = "MEDIUM"
 
-            if st.session_state.anomaly_hits >= 3:
-                st.session_state.threat_level = "HIGH"
-                st.error("Repeated abnormal activity detected. Session terminated.")
-                st.session_state.logged_in = False
-                time.sleep(1)
-                st.rerun()
-
             results = st.session_state.search_index.search(query)
 
             if results:
                 for idx in results:
-                    block = st.session_state.blockchain.chain[idx]
-                    st.code(format_log_for_display(block))
+                    block = get_block_by_index(
+                        st.session_state.blockchain.chain, idx
+                    )
+                    if block:
+                        st.code(format_log_for_display(block))
             else:
                 st.info("No matching logs found.")
 
@@ -249,7 +253,6 @@ def main_app():
     # -------- ADMIN: VIEW ALL LOGS --------
     elif menu == "View All Logs" and st.session_state.is_admin:
         st.markdown("### All User Logs")
-
         for block in st.session_state.blockchain.chain:
             st.code(
                 f"""
