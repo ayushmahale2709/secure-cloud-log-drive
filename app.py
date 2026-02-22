@@ -260,19 +260,49 @@ Integrity Verified: {st.session_state.blockchain.is_chain_valid()}
 
     # ---- Blockchain ----
     elif menu == "View Blockchain":
-        st.markdown("### ⛓️ Blockchain Ledger")
+       st.markdown("### ⛓️ Blockchain Ledger")
 
-        rows = []
-        for b in st.session_state.blockchain.chain:
-            rows.append({
-                "Index": b.index,
-                "Owner": b.owner,
-                "Time": b.timestamp,
-                "Hash": b.hash[:12],
-                "Prev Hash": b.previous_hash[:12]
-            })
+    is_valid = st.session_state.blockchain.is_chain_valid()
 
-        st.table(rows)
+    # Overall integrity badge
+    if is_valid:
+        st.success("Blockchain integrity verified. All blocks are consistent.")
+    else:
+        st.error("Blockchain integrity check failed. Chain has been tampered.")
+
+    st.markdown("---")
+
+    # Display each block as a card
+    for b in st.session_state.blockchain.chain:
+        with st.container():
+            col1, col2 = st.columns([1, 3])
+
+            with col1:
+                st.markdown(
+                    f"""
+                    **Block #{b.index}**
+                    
+                    Owner  
+                    `{b.owner}`
+                    """
+                )
+
+            with col2:
+                st.markdown(
+                    f"""
+                    **Timestamp:** {b.timestamp}  
+                    **Hash:** `{b.hash[:20]}...`  
+                    **Previous Hash:** `{b.previous_hash[:20]}...`
+                    """
+                )
+
+            # Per-block integrity hint
+            if is_valid:
+                st.caption("✔ Block linked correctly")
+            else:
+                st.caption("⚠ Block link verification failed")
+
+            st.markdown("---")
 
     # ---- Attack Graph ----
     elif menu == "Attack Graph":
