@@ -1,104 +1,92 @@
 /* =========================================================
-   ENHANCED PRO-THEME: SMOOTH TRANSITIONS & DEPTH
+   OLED BLACK & SNOW WHITE – HIGH CONTRAST THEME
    ========================================================= 
 */
 
-/* GLOBAL RESET & FONT SMOOTHING */
-html, body, [data-testid="stAppViewContainer"] {
-    background-color: #050505 !important;
-    color: #f8f9fa !important;
-    font-family: 'Inter', -apple-system, system-ui, sans-serif !important;
+/* 1. GLOBAL TEXT & BACKGROUND */
+html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+}
+
+/* Force every possible text element to Pure White */
+h1, h2, h3, h4, h5, h6, p, span, label, div, li {
+    color: #FFFFFF !important;
+    font-weight: 500 !important;
     -webkit-font-smoothing: antialiased;
 }
 
-/* SIDEBAR REFINEMENT */
-section[data-testid="stSidebar"] {
-    background-color: #0a0a0a !important;
-    border-right: 1px solid #1e1e1e !important;
-}
-
-/* =========================================================
-   INPUTS: Modern "Glass" Focus
-   ========================================================= 
-*/
-input, textarea, div[data-baseweb="select"] > div {
-    background-color: #121212 !important;
-    color: #ffffff !important;
-    border: 1px solid #2d2d2d !important;
+/* 2. INPUTS & SELECTBOXES (High Visibility) */
+/* We use a very dark grey for the box so white text "pops" */
+input, textarea, [data-baseweb="select"] > div {
+    background-color: #161616 !important;
+    color: #FFFFFF !important;
+    border: 2px solid #333333 !important; /* Thicker border for clarity */
     border-radius: 10px !important;
-    transition: all 0.2s ease-in-out !important;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4) !important;
 }
 
-/* High-Impact Focus State */
-input:focus, textarea:focus, div[data-baseweb="select"]:focus-within > div {
-    border-color: #0a84ff !important;
-    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2) !important;
-    outline: none !important;
+/* High-Contrast Focus State */
+input:focus, [data-baseweb="select"]:focus-within > div {
+    border-color: #007AFF !important; /* iOS Blue */
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.5) !important;
 }
 
-/* =========================================================
-   BUTTONS: Gradient & Animation
-   ========================================================= 
-*/
+/* 3. BUTTONS (Action Blue) */
 .stButton > button {
-    background: linear-gradient(135deg, #0a84ff 0%, #0056b3 100%) !important;
-    color: white !important;
+    background-color: #007AFF !important;
+    color: #FFFFFF !important;
+    border-radius: 10px !important;
     border: none !important;
-    border-radius: 8px !important;
-    padding: 0.6rem 1.5rem !important;
-    font-weight: 600 !important;
-    transition: transform 0.1s active, opacity 0.2s !important;
+    padding: 0.7rem 2rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     width: 100%;
+    transition: all 0.2s ease;
 }
 
 .stButton > button:hover {
-    opacity: 0.9 !important;
-    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3) !important;
+    background-color: #0056b3 !important;
     transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4) !important;
 }
 
-.stButton > button:active {
-    transform: translateY(1px);
-}
-
-/* =========================================================
-   ALERTS: Vibrant but Balanced
-   ========================================================= 
-*/
-[data-testid="stNotification"] {
-    border-radius: 12px !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    backdrop-filter: blur(10px);
-}
-
-.stAlert-success { background-color: rgba(6, 78, 59, 0.4) !important; color: #a7f3d0 !important; border-left: 5px solid #10b981 !important; }
-.stAlert-error { background-color: rgba(127, 29, 29, 0.4) !important; color: #fecaca !important; border-left: 5px solid #ef4444 !important; }
-.stAlert-warning { background-color: rgba(120, 53, 15, 0.4) !important; color: #fde68a !important; border-left: 5px solid #f59e0b !important; }
-
-/* =========================================================
-   METRICS & CARDS
-   ========================================================= 
-*/
+/* 4. METRICS & CARDS */
 [data-testid="metric-container"] {
-    background-color: #0f0f0f !important;
-    border: 1px solid #1e1e1e !important;
-    border-radius: 16px !important;
-    padding: 20px !important;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
+    background-color: #0c0c0c !important;
+    border: 1px solid #222222 !important;
+    border-left: 5px solid #007AFF !important; /* Visual accent */
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #AAAAAA !important; /* Slightly dimmer to make value pop */
 }
 
 [data-testid="stMetricValue"] {
-    color: #0a84ff !important;
-    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    font-size: 2rem !important;
 }
 
-/* =========================================================
-   DATA TABLES (STREAMLIT DATAFRAME)
-   ========================================================= 
-*/
-[data-testid="stTable"] {
+/* 5. ALERTS (Clear & Bold) */
+.stAlert {
     border-radius: 12px !important;
-    overflow: hidden !important;
-    border: 1px solid #1e1e1e !important;
+    border: none !important;
+}
+
+.stAlert p {
+    color: #FFFFFF !important; /* Ensures alert text is white */
+    font-weight: 600 !important;
+}
+
+/* Success = Emerald, Error = Crimson, Warning = Amber */
+.stAlert-success { background-color: #064e3b !important; border-bottom: 4px solid #10b981 !important; }
+.stAlert-error { background-color: #7f1d1d !important; border-bottom: 4px solid #ef4444 !important; }
+.stAlert-warning { background-color: #78350f !important; border-bottom: 4px solid #f59e0b !important; }
+
+/* 6. SIDEBAR CUSTOMIZATION */
+[data-testid="stSidebar"] {
+    background-color: #050505 !important;
+    border-right: 1px solid #222222 !important;
 }
