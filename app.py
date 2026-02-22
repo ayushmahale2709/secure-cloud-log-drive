@@ -100,8 +100,7 @@ def login_page():
                 if new_pass != confirm:
                     st.warning("Passwords do not match")
                 elif register_user(new_user, new_pass):
-                    st.success("Registration successful. Please login.")
-                    st.rerun()
+                    st.success("✅ User registered successfully. Please login.")
                 else:
                     st.error("User already exists")
 
