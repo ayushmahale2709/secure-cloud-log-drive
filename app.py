@@ -219,7 +219,7 @@ def main_app():
 
     # -------- USER: MY LOGS --------
     elif menu == "My Logs" and not st.session_state.is_admin:
-        st.markdown("### My Logs")
+        st.markdown("### My Logs (Decrypted View)")
 
         logs = get_logs_for_user(
             st.session_state.blockchain,
