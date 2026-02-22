@@ -54,9 +54,9 @@ init_session()
 
 # ---------------- HELPERS ----------------
 def get_block_by_index(chain, block_index):
-    for block in chain:
-        if block.index == block_index:
-            return block
+    for b in chain:
+        if b.index == block_index:
+            return b
     return None
 
 
@@ -74,7 +74,7 @@ def security_banner():
 def login_page():
     st.markdown("## Secure Cloud Log Drive")
     st.markdown(
-        "Secure log storage with integrity verification and access monitoring."
+        "Secure log storage with blockchain-based integrity verification."
     )
     st.markdown("---")
 
@@ -94,7 +94,6 @@ def login_page():
                     st.session_state.is_admin = (
                         st.session_state.username == "admin"
                     )
-
                     st.session_state.activity_log.append(
                         f"{datetime.now()} - User logged in ({st.session_state.username})"
                     )
@@ -125,7 +124,7 @@ def dashboard():
     c1, c2, c3 = st.columns(3)
     c1.metric("Total Blocks", len(st.session_state.blockchain.chain))
     c2.metric(
-        "Integrity Status",
+        "Blockchain Integrity",
         "Valid" if st.session_state.blockchain.is_chain_valid() else "Compromised"
     )
     c3.metric("Threat Level", st.session_state.threat_level)
@@ -171,6 +170,7 @@ def main_app():
                 "Add Log",
                 "Encrypted Search",
                 "My Logs",
+                "My Log Integrity",
                 "Audit Timeline"
             ]
         )
@@ -205,25 +205,6 @@ def main_app():
         query = st.text_input("Search keywords")
 
         if st.button("Search"):
-            now = time.time()
-            gap = now - st.session_state.last_action_time
-            st.session_state.last_action_time = now
-            st.session_state.search_count += 1
-
-            st.session_state.anomaly.record_activity(
-                st.session_state.search_count,
-                st.session_state.view_count,
-                gap
-            )
-
-            if st.session_state.anomaly.is_anomalous(
-                st.session_state.search_count,
-                st.session_state.view_count,
-                gap
-            ):
-                st.session_state.anomaly_hits += 1
-                st.session_state.threat_level = "MEDIUM"
-
             results = st.session_state.search_index.search(query)
 
             if results:
@@ -231,7 +212,7 @@ def main_app():
                     block = get_block_by_index(
                         st.session_state.blockchain.chain, idx
                     )
-                    if block:
+                    if block and block.owner == st.session_state.username:
                         st.code(format_log_for_display(block))
             else:
                 st.info("No matching logs found.")
@@ -239,6 +220,7 @@ def main_app():
     # -------- USER: MY LOGS --------
     elif menu == "My Logs" and not st.session_state.is_admin:
         st.markdown("### My Logs")
+
         logs = get_logs_for_user(
             st.session_state.blockchain,
             st.session_state.username
@@ -250,9 +232,38 @@ def main_app():
             for block in logs:
                 st.code(format_log_for_display(block))
 
+    # -------- USER: MY LOG INTEGRITY --------
+    elif menu == "My Log Integrity" and not st.session_state.is_admin:
+        st.markdown("### 🔗 My Log Integrity (Blockchain View)")
+
+        valid = st.session_state.blockchain.is_chain_valid()
+        if valid:
+            st.success("Blockchain integrity verified.")
+        else:
+            st.error("Blockchain integrity check failed.")
+
+        user_blocks = get_logs_for_user(
+            st.session_state.blockchain,
+            st.session_state.username
+        )
+
+        if not user_blocks:
+            st.info("No log entries available.")
+        else:
+            for b in user_blocks:
+                st.markdown(f"**Block #{b.index}**")
+                st.code(
+                    f"""
+Timestamp: {b.timestamp}
+Hash: {b.hash[:20]}...
+Previous Hash: {b.previous_hash[:20]}...
+"""
+                )
+
     # -------- ADMIN: VIEW ALL LOGS --------
     elif menu == "View All Logs" and st.session_state.is_admin:
         st.markdown("### All User Logs")
+
         for block in st.session_state.blockchain.chain:
             st.code(
                 f"""
