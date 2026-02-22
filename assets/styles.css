@@ -150,3 +150,47 @@ div[data-baseweb="option"] {
 div[data-baseweb="option"]:hover {
     background-color: #f2f2f7 !important;
 }
+
+/* ===== FIX SELECTBOX INNER DIVIDER ===== */
+div[data-baseweb="select"] {
+    background-color: transparent !important;
+}
+
+div[data-baseweb="select"] > div {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d1d6 !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+}
+
+/* REMOVE the vertical divider */
+div[data-baseweb="select"] div[aria-hidden="true"] {
+    display: none !important;
+}
+
+/* Arrow button */
+div[data-baseweb="select"] div[role="button"] {
+    background-color: #ffffff !important;
+    border-radius: 12px !important;
+}
+
+/* Text */
+div[data-baseweb="select"] span {
+    color: #000000 !important;
+    font-weight: 500;
+}
+
+/* Dropdown menu */
+div[data-baseweb="popover"] {
+    border-radius: 14px !important;
+    overflow: hidden !important;
+}
+
+div[data-baseweb="option"] {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+div[data-baseweb="option"]:hover {
+    background-color: #f2f2f7 !important;
+}
