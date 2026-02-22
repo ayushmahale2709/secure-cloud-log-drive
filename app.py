@@ -211,8 +211,8 @@ def main_app():
         with col2:
             mode = mode = st.selectbox(
     "Search Mode",
-    ["Match all keywords (AND)", "Match any keyword (OR)", "Exclude keyword (NOT)"],
-    help="Choose how keywords should be matched while searching logs"
+    ["AND", "OR", "NOT"],
+    help="Choose how multiple keywords should be matched"
 )
 
         if st.button("Search"):
