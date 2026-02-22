@@ -258,46 +258,36 @@ Integrity Verified: {st.session_state.blockchain.is_chain_valid()}
             for block in logs:
                 st.code(format_log_for_display(block))
 
-    # ---- Blockchain ----
+    # ---- View Blockchain (IMPROVED UI) ----
     elif menu == "View Blockchain":
-       st.markdown("### ⛓️ Blockchain Ledger")
+        st.markdown("### ⛓️ Blockchain Ledger")
 
-    is_valid = st.session_state.blockchain.is_chain_valid()
+        chain_valid = st.session_state.blockchain.is_chain_valid()
 
-    # Overall integrity badge
-    if is_valid:
-        st.success("Blockchain integrity verified. All blocks are consistent.")
-    else:
-        st.error("Blockchain integrity check failed. Chain has been tampered.")
+        if chain_valid:
+            st.success("Blockchain integrity verified. All blocks are consistent.")
+        else:
+            st.error("Blockchain integrity check failed. Chain may be tampered.")
 
-    st.markdown("---")
+        st.markdown("---")
 
-    # Display each block as a card
-    for b in st.session_state.blockchain.chain:
-        with st.container():
+        for b in st.session_state.blockchain.chain:
             col1, col2 = st.columns([1, 3])
 
             with col1:
-                st.markdown(
-                    f"""
-                    **Block #{b.index}**
-                    
-                    Owner  
-                    `{b.owner}`
-                    """
-                )
+                st.markdown(f"**Block #{b.index}**")
+                st.caption(f"Owner: {b.owner}")
 
             with col2:
                 st.markdown(
                     f"""
-                    **Timestamp:** {b.timestamp}  
-                    **Hash:** `{b.hash[:20]}...`  
-                    **Previous Hash:** `{b.previous_hash[:20]}...`
-                    """
+**Timestamp:** {b.timestamp}  
+**Hash:** `{b.hash[:20]}...`  
+**Previous Hash:** `{b.previous_hash[:20]}...`
+"""
                 )
 
-            # Per-block integrity hint
-            if is_valid:
+            if chain_valid:
                 st.caption("✔ Block linked correctly")
             else:
                 st.caption("⚠ Block link verification failed")
