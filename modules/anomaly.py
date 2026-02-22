@@ -5,7 +5,7 @@ from sklearn.ensemble import IsolationForest
 class AnomalyDetector:
     """
     ML-based anomaly detection using Isolation Forest.
-    Detects abnormal user behavior patterns.
+    Produces risk levels instead of simple True/False.
     """
 
     def __init__(self):
@@ -19,13 +19,11 @@ class AnomalyDetector:
 
     def record_activity(self, search_count, view_count, time_gap):
         """
-        Store user behavior as feature vector:
-        [search frequency, log view count, time gap]
+        Record user behavior as feature vector:
+        [search count, view count, time gap]
         """
-        feature_vector = [search_count, view_count, time_gap]
-        self.data.append(feature_vector)
+        self.data.append([search_count, view_count, time_gap])
 
-        # Train model after collecting baseline behavior
         if len(self.data) >= 10:
             self._train_model()
 
@@ -34,15 +32,22 @@ class AnomalyDetector:
         self.model.fit(X)
         self.trained = True
 
-    def is_anomalous(self, search_count, view_count, time_gap) -> bool:
+    def evaluate_risk(self, search_count, view_count, time_gap) -> str:
         """
-        Predict whether the behavior is anomalous.
+        Returns:
+        - NORMAL
+        - SUSPICIOUS
+        - HIGH
         """
         if not self.trained:
-            return False
+            return "NORMAL"
 
         X = np.array([[search_count, view_count, time_gap]])
         prediction = self.model.predict(X)
 
-        # Isolation Forest: -1 = anomaly, 1 = normal
-        return prediction[0] == -1
+        if prediction[0] == -1:
+            if search_count >= 6 or time_gap < 1.5:
+                return "HIGH"
+            return "SUSPICIOUS"
+
+        return "NORMAL"
