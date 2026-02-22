@@ -209,10 +209,11 @@ def main_app():
             query = st.text_input("Search keywords")
 
         with col2:
-            mode = st.selectbox(
-                "Search Mode",
-                ["AND", "OR", "NOT"]
-            )
+            mode = mode = st.selectbox(
+    "Search Mode",
+    ["Match all keywords (AND)", "Match any keyword (OR)", "Exclude keyword (NOT)"],
+    help="Choose how keywords should be matched while searching logs"
+)
 
         if st.button("Search"):
             results = st.session_state.search_index.search(query, mode)
