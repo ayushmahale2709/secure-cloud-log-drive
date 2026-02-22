@@ -1,105 +1,110 @@
-/* ===== GLOBAL ===== */
+/* ===== GLOBAL (APPLE DARK) ===== */
 html, body, [class*="css"] {
-    background-color: #0f172a !important; /* dark slate */
-    color: #ffffff !important;
-    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #0b0f14 !important; /* Apple-like charcoal */
+    color: #f5f5f7 !important;           /* Apple white */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 /* ===== HEADINGS & TEXT ===== */
 h1, h2, h3, h4, h5, h6,
 p, span, label {
-    color: #ffffff !important;
-    font-weight: 600;
+    color: #f5f5f7 !important;
+    font-weight: 500;
 }
 
 /* ===== SIDEBAR ===== */
 section[data-testid="stSidebar"] {
-    background-color: #020617 !important;
-    border-right: 1px solid #1e293b;
+    background-color: #111827 !important;
+    border-right: 1px solid #1f2937;
 }
 
 section[data-testid="stSidebar"] * {
-    color: #ffffff !important;
+    color: #f5f5f7 !important;
 }
 
-/* ===== INPUTS (TEXT INSIDE = BLACK) ===== */
+/* ===== INPUTS (APPLE STYLE) ===== */
 input, textarea {
     background-color: #ffffff !important;
     color: #000000 !important;
-    border: 1px solid #cfcfcf !important;
-    border-radius: 6px !important;
+    border: 1px solid #d1d1d6 !important;
+    border-radius: 10px !important;
+    padding: 0.55rem 0.75rem !important;
+    font-size: 0.95rem;
 }
 
 /* ===== BUTTONS ===== */
 .stButton > button {
-    background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+    background-color: #0a84ff !important; /* Apple blue */
     color: #ffffff !important;
     border: none !important;
-    border-radius: 8px !important;
-    padding: 0.6rem 1.2rem !important;
-    font-weight: 600 !important;
+    border-radius: 10px !important;
+    padding: 0.55rem 1.3rem !important;
+    font-weight: 500 !important;
 }
 
 .stButton > button:hover {
-    background: linear-gradient(135deg, #1d4ed8, #1e3a8a) !important;
+    background-color: #006edc !important;
 }
 
 /* ===== METRICS ===== */
 [data-testid="metric-container"] {
-    background-color: #020617 !important;
-    border: 1px solid #1e293b !important;
-    padding: 12px;
-    border-radius: 8px;
-    color: #ffffff !important;
+    background-color: #111827 !important;
+    border: 1px solid #1f2937 !important;
+    border-radius: 14px;
+    padding: 14px;
+    color: #f5f5f7 !important;
 }
 
 /* ===== TABLE ===== */
 table {
-    background-color: #020617 !important;
+    background-color: #111827 !important;
     border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 th {
-    background-color: #020617 !important;
-    color: #ffffff !important;
-    border: 1px solid #334155 !important;
+    background-color: #1f2937 !important;
+    color: #f5f5f7 !important;
+    border-bottom: 1px solid #374151 !important;
+    font-weight: 500;
 }
 
 td {
-    color: #ffffff !important;
-    border: 1px solid #1e293b !important;
+    color: #e5e7eb !important;
+    border-bottom: 1px solid #1f2937 !important;
 }
 
 /* ===== ALERTS ===== */
 .stAlert-success {
     background-color: #022c22 !important;
-    color: #ecfdf5 !important;
-    border-left: 5px solid #10b981 !important;
+    color: #d1fae5 !important;
+    border-left: 4px solid #10b981 !important;
 }
 
 .stAlert-error {
-    background-color: #450a0a !important;
-    color: #fef2f2 !important;
-    border-left: 5px solid #ef4444 !important;
+    background-color: #3f0d0d !important;
+    color: #fee2e2 !important;
+    border-left: 4px solid #ef4444 !important;
 }
 
 .stAlert-warning {
-    background-color: #422006 !important;
-    color: #fffbeb !important;
-    border-left: 5px solid #f59e0b !important;
+    background-color: #3b2f0b !important;
+    color: #fef3c7 !important;
+    border-left: 4px solid #f59e0b !important;
 }
 
 /* ===== CODE BLOCK ===== */
 pre, code {
-    background-color: #020617 !important;
-    color: #ffffff !important;
-    border: 1px solid #1e293b;
-    border-radius: 6px;
+    background-color: #111827 !important;
+    color: #e5e7eb !important;
+    border: 1px solid #1f2937;
+    border-radius: 10px;
 }
 
 /* ===== EXPANDER ===== */
 .streamlit-expanderHeader {
-    background-color: #020617 !important;
-    color: #ffffff !important;
-    border-radius: 6px;
+    background-color: #111827 !important;
+    color: #f5f5f7 !important;
+    border-radius: 12px;
 }
