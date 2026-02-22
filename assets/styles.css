@@ -1,32 +1,28 @@
 /* ===== GLOBAL ===== */
 html, body, [class*="css"] {
-    background-color: #ffffff !important;
-    color: #000000 !important;
+    background-color: #0f172a !important; /* dark slate */
+    color: #ffffff !important;
     font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* ===== HEADINGS ===== */
-h1, h2, h3, h4, h5, h6 {
-    color: #000000 !important;
+/* ===== HEADINGS & TEXT ===== */
+h1, h2, h3, h4, h5, h6,
+p, span, label {
+    color: #ffffff !important;
     font-weight: 600;
-}
-
-/* ===== PARAGRAPH & TEXT ===== */
-p, span, label, div {
-    color: #000000 !important;
 }
 
 /* ===== SIDEBAR ===== */
 section[data-testid="stSidebar"] {
-    background-color: #f5f7fa !important;
-    border-right: 1px solid #e0e0e0;
+    background-color: #020617 !important;
+    border-right: 1px solid #1e293b;
 }
 
 section[data-testid="stSidebar"] * {
-    color: #000000 !important;
+    color: #ffffff !important;
 }
 
-/* ===== INPUTS ===== */
+/* ===== INPUTS (TEXT INSIDE = BLACK) ===== */
 input, textarea {
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -50,59 +46,60 @@ input, textarea {
 
 /* ===== METRICS ===== */
 [data-testid="metric-container"] {
-    background-color: #f9fafb !important;
-    border: 1px solid #e5e7eb !important;
+    background-color: #020617 !important;
+    border: 1px solid #1e293b !important;
     padding: 12px;
     border-radius: 8px;
+    color: #ffffff !important;
 }
 
 /* ===== TABLE ===== */
 table {
-    background-color: #ffffff !important;
+    background-color: #020617 !important;
     border-collapse: collapse;
 }
 
 th {
-    background-color: #f1f5f9 !important;
-    color: #000000 !important;
-    border: 1px solid #cbd5e1 !important;
+    background-color: #020617 !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
 }
 
 td {
-    color: #000000 !important;
-    border: 1px solid #e5e7eb !important;
+    color: #ffffff !important;
+    border: 1px solid #1e293b !important;
 }
 
 /* ===== ALERTS ===== */
 .stAlert-success {
-    background-color: #ecfdf5 !important;
-    color: #065f46 !important;
+    background-color: #022c22 !important;
+    color: #ecfdf5 !important;
     border-left: 5px solid #10b981 !important;
 }
 
 .stAlert-error {
-    background-color: #fef2f2 !important;
-    color: #7f1d1d !important;
+    background-color: #450a0a !important;
+    color: #fef2f2 !important;
     border-left: 5px solid #ef4444 !important;
 }
 
 .stAlert-warning {
-    background-color: #fffbeb !important;
-    color: #92400e !important;
+    background-color: #422006 !important;
+    color: #fffbeb !important;
     border-left: 5px solid #f59e0b !important;
 }
 
 /* ===== CODE BLOCK ===== */
 pre, code {
-    background-color: #f8fafc !important;
-    color: #000000 !important;
-    border: 1px solid #e5e7eb;
+    background-color: #020617 !important;
+    color: #ffffff !important;
+    border: 1px solid #1e293b;
     border-radius: 6px;
 }
 
 /* ===== EXPANDER ===== */
 .streamlit-expanderHeader {
-    background-color: #f1f5f9 !important;
-    color: #000000 !important;
+    background-color: #020617 !important;
+    color: #ffffff !important;
     border-radius: 6px;
 }
