@@ -19,6 +19,7 @@ class Block:
 
 class Blockchain:
     def __init__(self):
+        # Ensure DB directory exists
         os.makedirs("data", exist_ok=True)
 
         self.chain = []
@@ -26,7 +27,9 @@ class Blockchain:
         self._create_table()
         self._load_chain()
 
-    # ---------------- TABLE SETUP ----------------
+    # -------------------------------------------------
+    # DATABASE TABLE
+    # -------------------------------------------------
     def _create_table(self):
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS blocks (
@@ -40,7 +43,9 @@ class Blockchain:
         """)
         self.conn.commit()
 
-    # ---------------- LOAD BLOCKCHAIN ----------------
+    # -------------------------------------------------
+    # LOAD BLOCKCHAIN FROM DATABASE
+    # -------------------------------------------------
     def _load_chain(self):
         cursor = self.conn.cursor()
         cursor.execute("""
@@ -51,10 +56,12 @@ class Blockchain:
         """)
         rows = cursor.fetchall()
 
+        # If DB is empty, create genesis block
         if not rows:
             self._create_genesis_block()
             return
 
+        # Load existing blocks
         for row in rows:
             try:
                 data = decrypt_data(row[3])
@@ -62,47 +69,70 @@ class Blockchain:
                 data = "[Decryption Error]"
 
             self.chain.append(
-                Block(row[0], row[1], row[2], data, row[4], row[5])
+                Block(
+                    index=row[0],
+                    previous_hash=row[1],
+                    timestamp=row[2],
+                    data=data,
+                    block_hash=row[4],
+                    owner=row[5]
+                )
             )
 
-    # ---------------- HASHING ----------------
+    # -------------------------------------------------
+    # HASH CALCULATION
+    # -------------------------------------------------
     def _calculate_hash(self, index, previous_hash, timestamp, data, owner):
         content = f"{index}{previous_hash}{timestamp}{data}{owner}"
         return hashlib.sha256(content.encode()).hexdigest()
 
-    # ---------------- GENESIS BLOCK ----------------
+    # -------------------------------------------------
+    # GENESIS BLOCK
+    # -------------------------------------------------
     def _create_genesis_block(self):
         timestamp = str(datetime.now())
         encrypted = encrypt_data("Genesis Block")
 
+        # Insert placeholder hash first
         cursor = self.conn.execute("""
             INSERT INTO blocks (previous_hash, timestamp, encrypted_data, block_hash, owner)
             VALUES (?, ?, ?, ?, ?)
-        """, ("0", timestamp, encrypted, "GENESIS_HASH", "system"))
+        """, ("0", timestamp, encrypted, "PENDING", "system"))
 
         block_index = cursor.lastrowid
+
         hash_value = self._calculate_hash(
             block_index, "0", timestamp, "Genesis Block", "system"
         )
 
-        # Update hash after knowing index
+        # Update real hash
         self.conn.execute("""
-            UPDATE blocks SET block_hash = ?
+            UPDATE blocks
+            SET block_hash = ?
             WHERE block_index = ?
         """, (hash_value, block_index))
         self.conn.commit()
 
         self.chain.append(
-            Block(block_index, "0", timestamp, "Genesis Block", hash_value, "system")
+            Block(
+                index=block_index,
+                previous_hash="0",
+                timestamp=timestamp,
+                data="Genesis Block",
+                block_hash=hash_value,
+                owner="system"
+            )
         )
 
-    # ---------------- ADD LOG ----------------
+    # -------------------------------------------------
+    # ADD LOG (NORMAL BLOCK)
+    # -------------------------------------------------
     def add_log(self, log_data, username):
         prev = self.chain[-1]
         timestamp = str(datetime.now())
         encrypted = encrypt_data(log_data)
 
-        # Insert first (DB decides index)
+        # Insert row first (DB assigns index)
         cursor = self.conn.execute("""
             INSERT INTO blocks (previous_hash, timestamp, encrypted_data, block_hash, owner)
             VALUES (?, ?, ?, ?, ?)
@@ -114,39 +144,54 @@ class Blockchain:
             block_index, prev.hash, timestamp, log_data, username
         )
 
-        # Update hash now that index exists
+        # Update correct hash
         self.conn.execute("""
-            UPDATE blocks SET block_hash = ?
+            UPDATE blocks
+            SET block_hash = ?
             WHERE block_index = ?
         """, (hash_value, block_index))
         self.conn.commit()
 
         block = Block(
-            block_index, prev.hash, timestamp, log_data, hash_value, username
+            index=block_index,
+            previous_hash=prev.hash,
+            timestamp=timestamp,
+            data=log_data,
+            block_hash=hash_value,
+            owner=username
         )
 
         self.chain.append(block)
         return block
 
-    # ---------------- INTEGRITY CHECK ----------------
+    # -------------------------------------------------
+    # CHAIN INTEGRITY VERIFICATION
+    # -------------------------------------------------
     def is_chain_valid(self):
         for i in range(1, len(self.chain)):
-            cur = self.chain[i]
-            prev = self.chain[i - 1]
+            current = self.chain[i]
+            previous = self.chain[i - 1]
 
-            if cur.previous_hash != prev.hash:
+            # Check hash linkage
+            if current.previous_hash != previous.hash:
                 return False
 
+            # Recalculate hash
             recalculated = self._calculate_hash(
-                cur.index, cur.previous_hash,
-                cur.timestamp, cur.data, cur.owner
+                current.index,
+                current.previous_hash,
+                current.timestamp,
+                current.data,
+                current.owner
             )
 
-            if cur.hash != recalculated:
+            if current.hash != recalculated:
                 return False
 
         return True
 
-    # ---------------- USER LOGS ----------------
+    # -------------------------------------------------
+    # USER LOG FILTER
+    # -------------------------------------------------
     def get_user_logs(self, username):
         return [b for b in self.chain if b.owner == username]
