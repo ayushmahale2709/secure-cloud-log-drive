@@ -9,6 +9,7 @@ from modules.blockchain import Blockchain
 from modules.search_index import SearchIndex
 from modules.logs import get_logs_for_user, format_log_for_display
 from modules.anomaly import AnomalyDetector
+from modules.security_state import SecurityState
 
 
 # ---------------- PAGE CONFIG ----------------
@@ -35,11 +36,11 @@ def init_session():
         "blockchain": Blockchain(),
         "search_index": SearchIndex(),
         "anomaly": AnomalyDetector(),
+        "security": SecurityState(),
         "search_count": 0,
         "view_count": 0,
         "last_action_time": time.time(),
-        "threat_level": "LOW",
-        "anomaly_hits": 0,
+        "warned_user": False,
         "activity_log": []
     }
 
@@ -62,20 +63,20 @@ def get_block_by_index(chain, block_index):
 
 # ---------------- SECURITY BANNER ----------------
 def security_banner():
-    if st.session_state.threat_level == "LOW":
+    level = st.session_state.security.threat_level
+
+    if level == "LOW":
         st.success("System operating normally.")
-    elif st.session_state.threat_level == "MEDIUM":
-        st.warning("Unusual access behavior detected.")
+    elif level == "MEDIUM":
+        st.warning("Suspicious activity detected in the system.")
     else:
-        st.error("High-risk activity detected. Session restricted.")
+        st.error("High-risk activity detected. Access restricted.")
 
 
 # ---------------- LOGIN UI ----------------
 def login_page():
     st.markdown("## Secure Cloud Log Drive")
-    st.markdown(
-        "Secure log storage with blockchain-based integrity verification."
-    )
+    st.markdown("Secure log storage with blockchain-based integrity verification.")
     st.markdown("---")
 
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -127,10 +128,7 @@ def dashboard():
         "Blockchain Integrity",
         "Valid" if st.session_state.blockchain.is_chain_valid() else "Compromised"
     )
-    c3.metric("Threat Level", st.session_state.threat_level)
-
-    risk = min(100, st.session_state.anomaly_hits * 33)
-    st.progress(risk, text=f"Estimated Risk Level: {risk}%")
+    c3.metric("Threat Level", st.session_state.security.threat_level)
 
 
 # ---------------- MAIN APP ----------------
@@ -138,18 +136,16 @@ def main_app():
     st.sidebar.markdown("## Secure Cloud Log Drive")
     st.sidebar.markdown(f"User: **{st.session_state.username}**")
 
-    if st.session_state.is_admin:
-        st.sidebar.markdown("🛡️ Role: Administrator")
-    else:
-        st.sidebar.markdown("👤 Role: Standard User")
+    st.sidebar.markdown(
+        "🛡️ Role: Administrator"
+        if st.session_state.is_admin else
+        "👤 Role: Standard User"
+    )
 
     if st.sidebar.button("Sign Out"):
         st.session_state.logged_in = False
-        st.session_state.username = None
-        st.session_state.is_admin = False
         st.rerun()
 
-    # -------- ROLE BASED MENU --------
     if st.session_state.is_admin:
         menu = st.sidebar.radio(
             "Navigation",
@@ -175,173 +171,93 @@ def main_app():
             ]
         )
 
-    # -------- DASHBOARD --------
     if menu == "Dashboard":
         dashboard()
 
-    # -------- USER: ADD LOG --------
-    elif menu == "Add Log" and not st.session_state.is_admin:
-        st.markdown("### Add Log Entry")
-        log_data = st.text_area("Log details")
-
-        if st.button("Store Log"):
-            if log_data.strip():
-                block = st.session_state.blockchain.add_log(
-                    log_data, st.session_state.username
-                )
-                st.session_state.search_index.index_log(
-                    log_data, block.index
-                )
-                st.session_state.activity_log.append(
-                    f"{datetime.now()} - Log added by {st.session_state.username}"
-                )
-                st.success(f"Log stored in Block #{block.index}")
-            else:
-                st.warning("Log content cannot be empty.")
-
-    # -------- USER: SEARCH (AND / OR / NOT) --------
+    # ---------------- USER SEARCH (SECURITY ENFORCED) ----------------
     elif menu == "Encrypted Search" and not st.session_state.is_admin:
         st.markdown("### 🔍 Search Logs")
 
         col1, col2 = st.columns([3, 1])
-
-        with col1:
-            query = st.text_input("Search keywords")
-
-        with col2:
-            mode = mode = st.selectbox(
-    "Search Mode",
-    ["AND", "OR", "NOT"],
-    help="Choose how multiple keywords should be matched"
-)
+        query = col1.text_input("Search keywords")
+        mode = col2.selectbox("Search Mode", ["AND", "OR", "NOT"])
 
         if st.button("Search"):
+            now = time.time()
+            gap = now - st.session_state.last_action_time
+            st.session_state.last_action_time = now
+
+            st.session_state.search_count += 1
+            st.session_state.security.record_search()
+
+            st.session_state.anomaly.record_activity(
+                st.session_state.search_count,
+                st.session_state.view_count,
+                gap
+            )
+
+            risk = st.session_state.anomaly.evaluate_risk(
+                st.session_state.search_count,
+                st.session_state.view_count,
+                gap
+            )
+
+            if risk == "SUSPICIOUS":
+                st.session_state.security.record_anomaly()
+                if not st.session_state.warned_user:
+                    st.warning("⚠️ Suspicious activity detected. Please slow down.")
+                    st.session_state.warned_user = True
+
+            elif risk == "HIGH":
+                st.session_state.security.record_anomaly()
+                st.error("🚨 Security policy violation. Session terminated.")
+                st.session_state.activity_log.append(
+                    f"{datetime.now()} - User logged out due to anomaly"
+                )
+                st.session_state.logged_in = False
+                time.sleep(1)
+                st.rerun()
+
             results = st.session_state.search_index.search(query, mode)
 
-            if results:
-                for idx in results:
-                    block = get_block_by_index(
-                        st.session_state.blockchain.chain, idx
-                    )
-                    if block and block.owner == st.session_state.username:
-                        st.code(format_log_for_display(block))
-            else:
-                st.info("No matching logs found.")
+            for idx in results:
+                block = get_block_by_index(
+                    st.session_state.blockchain.chain, idx
+                )
+                if block and block.owner == st.session_state.username:
+                    st.code(format_log_for_display(block))
 
-    # -------- USER: MY LOGS --------
-    elif menu == "My Logs" and not st.session_state.is_admin:
-        st.markdown("### My Logs (Decrypted View)")
-
-        logs = get_logs_for_user(
-            st.session_state.blockchain,
-            st.session_state.username
-        )
-
-        if not logs:
-            st.info("No logs found.")
-        else:
-            for block in logs:
-                st.code(format_log_for_display(block))
-
-    # -------- USER: MY LOG INTEGRITY --------
-    elif menu == "My Log Integrity" and not st.session_state.is_admin:
-        st.markdown("### 🔗 My Log Integrity (Blockchain View)")
-
-        if st.session_state.blockchain.is_chain_valid():
-            st.success("Blockchain integrity verified.")
-        else:
-            st.error("Blockchain integrity check failed.")
-
-        user_blocks = get_logs_for_user(
-            st.session_state.blockchain,
-            st.session_state.username
-        )
-
-        for b in user_blocks:
-            st.markdown(f"**Block #{b.index}**")
-            st.code(
-                f"""
-Timestamp: {b.timestamp}
-Hash: {b.hash[:20]}...
-Previous Hash: {b.previous_hash[:20]}...
-"""
-            )
-
-    # -------- ADMIN: VIEW ALL LOGS --------
-    elif menu == "View All Logs" and st.session_state.is_admin:
-        st.markdown("### All User Logs")
-
-        for block in st.session_state.blockchain.chain:
-            st.code(
-                f"""
-User: {block.owner}
-Block: {block.index}
-Time: {block.timestamp}
-Log: {block.data}
-"""
-            )
-
-    # -------- ADMIN: BLOCKCHAIN LEDGER --------
-    elif menu == "Blockchain Ledger" and st.session_state.is_admin:
-        st.markdown("### Blockchain Ledger")
-
-        if st.session_state.blockchain.is_chain_valid():
-            st.success("Blockchain integrity verified.")
-        else:
-            st.error("Blockchain integrity compromised.")
-
-        for b in st.session_state.blockchain.chain:
-            st.markdown(f"**Block #{b.index}**")
-            st.code(
-                f"""
-Owner: {b.owner}
-Timestamp: {b.timestamp}
-Hash: {b.hash}
-Previous Hash: {b.previous_hash}
-"""
-            )
-
-    # -------- ADMIN: THREAT OVERVIEW --------
+    # ---------------- ADMIN THREAT OVERVIEW ----------------
     elif menu == "Threat Overview" and st.session_state.is_admin:
         st.markdown("### Threat Overview")
 
-        st.metric("Search Count", st.session_state.search_count)
-        st.metric("View Count", st.session_state.view_count)
-        st.metric("Anomaly Hits", st.session_state.anomaly_hits)
+        st.metric("Search Count", st.session_state.security.search_count)
+        st.metric("View Count", st.session_state.security.view_count)
+        st.metric("Anomaly Hits", st.session_state.security.anomaly_hits)
 
         st.progress(
-            min(100, st.session_state.anomaly_hits * 33),
-            text="Estimated Threat Level"
+            min(100, st.session_state.security.anomaly_hits * 33),
+            text=f"Threat Level: {st.session_state.security.threat_level}"
         )
 
-    # -------- ADMIN: GRAPH VISUALIZATION --------
+    # ---------------- ADMIN VISUALIZATION ----------------
     elif menu == "Threat Flow Visualization" and st.session_state.is_admin:
-        st.markdown("### Threat Flow Visualization")
-
         g = graphviz.Digraph()
         g.node("User", "User Session")
 
-        if st.session_state.threat_level == "LOW":
+        if st.session_state.security.threat_level == "LOW":
             g.node("Normal", "Normal Activity", style="filled", fillcolor="lightgreen")
             g.edge("User", "Normal")
+        elif st.session_state.security.threat_level == "MEDIUM":
+            g.node("Anomaly", "Anomalous Activity", style="filled", fillcolor="orange")
+            g.edge("User", "Anomaly")
         else:
-            g.node("Observed", "Anomalous Activity", style="filled", fillcolor="orange")
-            g.node("Risk", "Potential Abuse", style="filled", fillcolor="red")
-            g.edge("User", "Observed")
-            g.edge("Observed", "Risk")
+            g.node("Anomaly", "Anomalous Activity", style="filled", fillcolor="orange")
+            g.node("Abuse", "Potential Abuse", style="filled", fillcolor="red")
+            g.edge("User", "Anomaly")
+            g.edge("Anomaly", "Abuse")
 
         st.graphviz_chart(g)
-
-    # -------- AUDIT TIMELINE --------
-    elif menu == "Audit Timeline":
-        st.markdown("### Session Activity Log")
-        st.code("\n".join(st.session_state.activity_log[-30:]))
-
-        st.download_button(
-            "Export Activity Log",
-            data="\n".join(st.session_state.activity_log),
-            file_name="audit_log.txt"
-        )
 
 
 # ---------------- ROUTER ----------------
