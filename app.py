@@ -151,6 +151,7 @@ def main_app():
                 "View All Logs",
                 "Blockchain Ledger",
                 "Threat Overview",
+                "Threat Flow Visualization",
                 "Audit Timeline"
             ]
         )
@@ -213,6 +214,14 @@ def main_app():
                 gap
             ):
                 st.session_state.anomaly_hits += 1
+                st.session_state.threat_level = "MEDIUM"
+
+            if st.session_state.anomaly_hits >= 3:
+                st.session_state.threat_level = "HIGH"
+                st.error("Repeated abnormal activity detected. Session terminated.")
+                st.session_state.logged_in = False
+                time.sleep(1)
+                st.rerun()
 
             results = st.session_state.search_index.search(query)
 
@@ -284,6 +293,24 @@ Previous Hash: {b.previous_hash[:20]}...
             min(100, st.session_state.anomaly_hits * 33),
             text="Estimated Threat Level"
         )
+
+    # -------- ADMIN: GRAPH VISUALIZATION --------
+    elif menu == "Threat Flow Visualization" and st.session_state.is_admin:
+        st.markdown("### Threat Flow Visualization")
+
+        g = graphviz.Digraph()
+        g.node("User", "User Session")
+
+        if st.session_state.threat_level == "LOW":
+            g.node("Normal", "Normal Activity", style="filled", fillcolor="lightgreen")
+            g.edge("User", "Normal")
+        else:
+            g.node("Observed", "Anomalous Activity", style="filled", fillcolor="orange")
+            g.node("Risk", "Potential Abuse", style="filled", fillcolor="red")
+            g.edge("User", "Observed")
+            g.edge("Observed", "Risk")
+
+        st.graphviz_chart(g)
 
     # -------- AUDIT TIMELINE --------
     elif menu == "Audit Timeline":
