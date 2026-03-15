@@ -10,11 +10,8 @@ from modules.search_index import SearchIndex
 from modules.logs import get_logs_for_user, format_log_for_display
 from modules.anomaly import AnomalyDetector
 from modules.security_state import SecurityState
-from modules.visualization import (
-    draw_blockchain,
-    draw_architecture,
-    draw_threat_flow
-)
+from modules.visualization import draw_blockchain, draw_threat_flow
+
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
@@ -23,10 +20,12 @@ st.set_page_config(
     layout="wide"
 )
 
+
 # ---------------- LOAD CSS ----------------
 def load_css():
     with open("assets/styles.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 
 load_css()
 
@@ -54,6 +53,7 @@ def init_session():
 
     if hasattr(st.session_state.search_index, "build_index"):
         st.session_state.search_index.build_index(st.session_state.blockchain)
+
 
 init_session()
 
@@ -110,7 +110,7 @@ def login_page():
 
     hero_section()
 
-    col1, col2, col3 = st.columns([1,2,1])
+    col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
 
@@ -139,7 +139,6 @@ def login_page():
 
                 else:
                     st.error("Authentication failed")
-
 
         with tab2:
 
@@ -198,14 +197,6 @@ def dashboard():
     graph = draw_blockchain(st.session_state.blockchain.chain)
 
     st.graphviz_chart(graph)
-
-    st.markdown("---")
-
-    st.subheader("System Architecture")
-
-    arch = draw_architecture()
-
-    st.graphviz_chart(arch)
 
 
 # ---------------- MAIN APP ----------------
