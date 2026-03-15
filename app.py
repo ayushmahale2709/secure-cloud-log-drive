@@ -38,7 +38,8 @@ def init_session():
         "blockchain": Blockchain(),
         "search_index": SearchIndex(),
         "anomaly": AnomalyDetector(),
-        "security": SecurityState(),
+        "user_security": {},
+        "security": None,
         "search_count": 0,
         "view_count": 0,
         "last_action_time": time.time(),
@@ -56,16 +57,19 @@ init_session()
 # ---------------- SECURITY STATUS ----------------
 def security_banner():
 
+    if not st.session_state.security:
+        return
+
     level = st.session_state.security.threat_level
 
     if level == "LOW":
-        st.success("🟢 System operating normally")
+        st.success("System operating normally")
 
     elif level == "MEDIUM":
-        st.warning("🟡 Suspicious activity detected")
+        st.warning("Suspicious activity detected")
 
     else:
-        st.error("🔴 High-risk activity detected")
+        st.error("High-risk activity detected")
 
 
 # ---------------- HERO HEADER ----------------
@@ -113,13 +117,25 @@ def login_page():
                     st.session_state.logged_in = True
                     st.session_state.username = username.strip().lower()
 
-                    # ADMIN DETECTION
                     st.session_state.is_admin = (
                         st.session_state.username == "admin"
                     )
 
+                    # ---------- USER SECURITY INITIALIZATION ----------
+                    user = st.session_state.username
+
+                    if user not in st.session_state.user_security:
+                        st.session_state.user_security[user] = SecurityState()
+
+                    st.session_state.security = st.session_state.user_security[user]
+
+                    # reset counters
+                    st.session_state.search_count = 0
+                    st.session_state.view_count = 0
+                    st.session_state.warned_user = False
+
                     st.session_state.activity_log.append(
-                        f"{datetime.now()} - User logged in ({st.session_state.username})"
+                        f"{datetime.now()} - User logged in ({user})"
                     )
 
                     st.rerun()
@@ -161,15 +177,18 @@ def dashboard():
         "Valid" if st.session_state.blockchain.is_chain_valid() else "Compromised"
     )
 
-    col3.metric("Threat Level", st.session_state.security.threat_level)
+    if st.session_state.security:
+        col3.metric("Threat Level", st.session_state.security.threat_level)
 
     st.markdown("---")
 
-    s1, s2, s3 = st.columns(3)
+    if st.session_state.security:
 
-    s1.metric("Search Requests", st.session_state.security.search_count)
-    s2.metric("Log Views", st.session_state.security.view_count)
-    s3.metric("Anomaly Hits", st.session_state.security.anomaly_hits)
+        s1, s2, s3 = st.columns(3)
+
+        s1.metric("Search Requests", st.session_state.security.search_count)
+        s2.metric("Log Views", st.session_state.security.view_count)
+        s3.metric("Anomaly Hits", st.session_state.security.anomaly_hits)
 
     st.markdown("---")
 
@@ -207,6 +226,7 @@ def main_app():
 
         st.session_state.logged_in = False
         st.session_state.username = None
+        st.session_state.security = None
 
         st.rerun()
 
@@ -241,7 +261,6 @@ def main_app():
         )
 
 
-    # -------- DASHBOARD --------
     if menu == "Dashboard":
         dashboard()
 
@@ -383,6 +402,30 @@ def main_app():
 
     # ================= ADMIN FEATURES =================
 
+    elif menu == "Threat Overview" and st.session_state.is_admin:
+
+        st.markdown("### Threat Overview")
+
+        total_search = sum(s.search_count for s in st.session_state.user_security.values())
+        total_views = sum(s.view_count for s in st.session_state.user_security.values())
+        total_anomaly = sum(s.anomaly_hits for s in st.session_state.user_security.values())
+
+        st.metric("Total Searches", total_search)
+        st.metric("Total Views", total_views)
+        st.metric("Total Anomalies", total_anomaly)
+
+
+    elif menu == "Threat Flow Visualization" and st.session_state.is_admin:
+
+        st.markdown("### Threat Flow Visualization")
+
+        graph = draw_threat_flow(
+            st.session_state.security.threat_level
+        )
+
+        st.graphviz_chart(graph)
+
+
     elif menu == "View All Logs" and st.session_state.is_admin:
 
         st.markdown("### All Logs")
@@ -414,26 +457,6 @@ Hash           : {b.hash}
 Previous Hash  : {b.previous_hash}
 """
             )
-
-
-    elif menu == "Threat Overview" and st.session_state.is_admin:
-
-        st.markdown("### Threat Overview")
-
-        st.metric("Search Count", st.session_state.security.search_count)
-        st.metric("View Count", st.session_state.security.view_count)
-        st.metric("Anomaly Hits", st.session_state.security.anomaly_hits)
-
-
-    elif menu == "Threat Flow Visualization" and st.session_state.is_admin:
-
-        st.markdown("### Threat Flow Visualization")
-
-        graph = draw_threat_flow(
-            st.session_state.security.threat_level
-        )
-
-        st.graphviz_chart(graph)
 
 
     elif menu == "Audit Timeline":
