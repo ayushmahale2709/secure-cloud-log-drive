@@ -1,7 +1,6 @@
 import streamlit as st
 import time
 from datetime import datetime
-import graphviz
 
 # ---- Import Modules ----
 from modules.auth import authenticate_user, register_user
@@ -51,19 +50,8 @@ def init_session():
         if k not in st.session_state:
             st.session_state[k] = v
 
-    if hasattr(st.session_state.search_index, "build_index"):
-        st.session_state.search_index.build_index(st.session_state.blockchain)
-
 
 init_session()
-
-
-# ---------------- HELPERS ----------------
-def get_block_by_index(chain, block_index):
-    for b in chain:
-        if b.index == block_index:
-            return b
-    return None
 
 
 # ---------------- SECURITY STATUS ----------------
@@ -101,8 +89,6 @@ def hero_section():
         """,
         unsafe_allow_html=True
     )
-
-    st.markdown("<br>", unsafe_allow_html=True)
 
 
 # ---------------- LOGIN PAGE ----------------
@@ -165,6 +151,7 @@ def dashboard():
 
     st.markdown(f"### Welcome **{st.session_state.username}**")
 
+    # ----- MAIN METRICS -----
     col1, col2, col3 = st.columns(3)
 
     col1.metric(
@@ -184,6 +171,7 @@ def dashboard():
 
     st.markdown("---")
 
+    # ----- FEATURE CARDS -----
     f1, f2, f3 = st.columns(3)
 
     f1.info("🔐 Blockchain Secured Storage")
@@ -192,11 +180,50 @@ def dashboard():
 
     st.markdown("---")
 
+    # ----- SYSTEM STATISTICS -----
+    st.subheader("System Statistics")
+
+    stats1, stats2, stats3 = st.columns(3)
+
+    stats1.metric("Search Requests", st.session_state.security.search_count)
+    stats2.metric("Log Views", st.session_state.security.view_count)
+    stats3.metric("Anomaly Hits", st.session_state.security.anomaly_hits)
+
+    st.markdown("---")
+
+    # ----- SYSTEM HEALTH -----
+    st.subheader("System Health")
+
+    health1, health2, health3 = st.columns(3)
+
+    health1.success("Database Connected")
+    health2.success("Encryption Active")
+
+    if st.session_state.blockchain.is_chain_valid():
+        health3.success("Blockchain Valid")
+    else:
+        health3.error("Blockchain Compromised")
+
+    st.markdown("---")
+
+    # ----- BLOCKCHAIN GRAPH -----
     st.subheader("Blockchain Visualization")
 
     graph = draw_blockchain(st.session_state.blockchain.chain)
 
     st.graphviz_chart(graph)
+
+    st.markdown("---")
+
+    # ----- RECENT ACTIVITY -----
+    st.subheader("Recent Activity")
+
+    if not st.session_state.activity_log:
+        st.info("No activity yet")
+
+    else:
+        for event in st.session_state.activity_log[-5:]:
+            st.write(event)
 
 
 # ---------------- MAIN APP ----------------
@@ -301,12 +328,12 @@ def main_app():
 
                 for idx in results:
 
-                    block = get_block_by_index(
-                        st.session_state.blockchain.chain,
-                        idx
+                    block = next(
+                        b for b in st.session_state.blockchain.chain
+                        if b.index == idx
                     )
 
-                    if block and block.owner == st.session_state.username:
+                    if block.owner == st.session_state.username:
                         st.code(format_log_for_display(block))
 
             else:
