@@ -25,7 +25,6 @@ def load_css():
     with open("assets/styles.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-
 load_css()
 
 
@@ -50,7 +49,6 @@ def init_session():
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
-
 
 init_session()
 
@@ -114,6 +112,8 @@ def login_page():
 
                     st.session_state.logged_in = True
                     st.session_state.username = username.strip().lower()
+
+                    # ADMIN DETECTION
                     st.session_state.is_admin = (
                         st.session_state.username == "admin"
                     )
@@ -198,6 +198,11 @@ def main_app():
 
     st.sidebar.markdown(f"User: **{st.session_state.username}**")
 
+    if st.session_state.is_admin:
+        st.sidebar.markdown("🛡️ Role: Administrator")
+    else:
+        st.sidebar.markdown("👤 Role: Standard User")
+
     if st.sidebar.button("Sign Out"):
 
         st.session_state.logged_in = False
@@ -206,17 +211,34 @@ def main_app():
         st.rerun()
 
 
-    menu = st.sidebar.radio(
-        "Navigation",
-        [
-            "Dashboard",
-            "Add Log",
-            "Encrypted Search",
-            "My Logs",
-            "My Log Integrity",
-            "Audit Timeline"
-        ]
-    )
+    # -------- ROLE BASED MENU --------
+    if st.session_state.is_admin:
+
+        menu = st.sidebar.radio(
+            "Navigation",
+            [
+                "Dashboard",
+                "View All Logs",
+                "Blockchain Ledger",
+                "Threat Overview",
+                "Threat Flow Visualization",
+                "Audit Timeline"
+            ]
+        )
+
+    else:
+
+        menu = st.sidebar.radio(
+            "Navigation",
+            [
+                "Dashboard",
+                "Add Log",
+                "Encrypted Search",
+                "My Logs",
+                "My Log Integrity",
+                "Audit Timeline"
+            ]
+        )
 
 
     # -------- DASHBOARD --------
@@ -224,8 +246,9 @@ def main_app():
         dashboard()
 
 
-    # -------- ADD LOG --------
-    elif menu == "Add Log":
+    # ================= USER FEATURES =================
+
+    elif menu == "Add Log" and not st.session_state.is_admin:
 
         st.markdown("### Add Log Entry")
 
@@ -255,8 +278,7 @@ def main_app():
                 st.warning("Log content cannot be empty")
 
 
-    # -------- SEARCH --------
-    elif menu == "Encrypted Search":
+    elif menu == "Encrypted Search" and not st.session_state.is_admin:
 
         st.markdown("### Search Logs")
 
@@ -272,11 +294,9 @@ def main_app():
             gap = now - st.session_state.last_action_time
             st.session_state.last_action_time = now
 
-            # update counters
             st.session_state.search_count += 1
             st.session_state.security.record_search()
 
-            # anomaly tracking
             st.session_state.anomaly.record_activity(
                 st.session_state.search_count,
                 st.session_state.view_count,
@@ -331,8 +351,7 @@ def main_app():
                 st.info("No matching logs found")
 
 
-    # -------- MY LOGS --------
-    elif menu == "My Logs":
+    elif menu == "My Logs" and not st.session_state.is_admin:
 
         st.markdown("### My Logs")
 
@@ -352,8 +371,7 @@ def main_app():
                 st.code(format_log_for_display(block))
 
 
-    # -------- INTEGRITY --------
-    elif menu == "My Log Integrity":
+    elif menu == "My Log Integrity" and not st.session_state.is_admin:
 
         st.markdown("### My Log Integrity")
 
@@ -363,7 +381,61 @@ def main_app():
             st.error("Blockchain integrity check failed")
 
 
-    # -------- AUDIT --------
+    # ================= ADMIN FEATURES =================
+
+    elif menu == "View All Logs" and st.session_state.is_admin:
+
+        st.markdown("### All Logs")
+
+        for block in st.session_state.blockchain.chain:
+
+            st.code(
+                f"""
+User : {block.owner}
+Block: {block.index}
+Time : {block.timestamp}
+Log  : {block.data}
+"""
+            )
+
+
+    elif menu == "Blockchain Ledger" and st.session_state.is_admin:
+
+        st.markdown("### Blockchain Ledger")
+
+        for b in st.session_state.blockchain.chain:
+
+            st.code(
+                f"""
+Block ID       : {b.index}
+Owner          : {b.owner}
+Timestamp      : {b.timestamp}
+Hash           : {b.hash}
+Previous Hash  : {b.previous_hash}
+"""
+            )
+
+
+    elif menu == "Threat Overview" and st.session_state.is_admin:
+
+        st.markdown("### Threat Overview")
+
+        st.metric("Search Count", st.session_state.security.search_count)
+        st.metric("View Count", st.session_state.security.view_count)
+        st.metric("Anomaly Hits", st.session_state.security.anomaly_hits)
+
+
+    elif menu == "Threat Flow Visualization" and st.session_state.is_admin:
+
+        st.markdown("### Threat Flow Visualization")
+
+        graph = draw_threat_flow(
+            st.session_state.security.threat_level
+        )
+
+        st.graphviz_chart(graph)
+
+
     elif menu == "Audit Timeline":
 
         st.markdown("### Audit Timeline")
