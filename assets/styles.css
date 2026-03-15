@@ -7,12 +7,14 @@ body,
 #root,
 .stApp,
 [data-testid="stAppViewContainer"] {
+
     background: radial-gradient(circle at top,
         #0f172a 0%,
-        #020617 70%,
+        #020617 65%,
         #000000 100%) !important;
 
     color: #f8fafc !important;
+
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
 }
 
@@ -21,13 +23,24 @@ body,
 HEADINGS
 ========================================================= */
 
-h1, h2, h3, h4, h5, h6 {
+h1,h2,h3,h4,h5,h6 {
+
     color: #f8fafc !important;
+
     font-weight: 600;
-    letter-spacing: 0.5px;
+
+    letter-spacing: 0.4px;
+}
+
+h1 {
+
+    letter-spacing: 1px;
+
+    text-shadow: 0 0 12px rgba(59,130,246,0.35);
 }
 
 p, span, label, div {
+
     color: #e5e7eb !important;
 }
 
@@ -37,12 +50,26 @@ SIDEBAR
 ========================================================= */
 
 section[data-testid="stSidebar"] {
-    background-color: #020617 !important;
+
+    background: #020617 !important;
+
     border-right: 1px solid #1e293b;
 }
 
 section[data-testid="stSidebar"] * {
+
     color: #e5e7eb !important;
+}
+
+section[data-testid="stSidebar"] h2 {
+
+    font-weight: 600;
+
+    letter-spacing: 0.5px;
+
+    border-bottom: 1px solid #1e293b;
+
+    padding-bottom: 10px;
 }
 
 
@@ -54,12 +81,15 @@ input,
 textarea {
 
     background-color: #ffffff !important;
+
     color: #000000 !important;
 
     border: 1px solid #cbd5e1 !important;
+
     border-radius: 8px !important;
 
     padding: 0.6rem 0.75rem !important;
+
     font-size: 0.95rem;
 }
 
@@ -67,9 +97,43 @@ input:focus,
 textarea:focus {
 
     outline: none !important;
+
     border-color: #3b82f6 !important;
 
     box-shadow: 0 0 0 2px rgba(59,130,246,0.25);
+}
+
+
+/* =========================================================
+DROPDOWNS
+========================================================= */
+
+div[data-baseweb="select"] > div {
+
+    background-color: #ffffff !important;
+
+    border: 1px solid #cbd5e1 !important;
+
+    border-radius: 8px !important;
+}
+
+div[data-baseweb="select"] span {
+
+    color: #000000 !important;
+
+    font-weight: 500;
+}
+
+div[data-baseweb="option"] {
+
+    background-color: #ffffff !important;
+
+    color: #000000 !important;
+}
+
+div[data-baseweb="option"]:hover {
+
+    background-color: #e5e7eb !important;
 }
 
 
@@ -82,6 +146,7 @@ BUTTONS
     background: linear-gradient(135deg,#2563eb,#1d4ed8) !important;
 
     color: #ffffff !important;
+
     border: none !important;
 
     border-radius: 8px !important;
@@ -103,6 +168,7 @@ BUTTONS
 }
 
 .stButton > button:active {
+
     transform: translateY(0);
 }
 
@@ -121,14 +187,67 @@ METRIC CARDS
 
     padding: 16px;
 
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease,
+                box-shadow 0.2s ease;
 }
 
 [data-testid="metric-container"]:hover {
 
     transform: translateY(-3px);
 
-    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    box-shadow: 0 12px 22px rgba(0,0,0,0.45);
+}
+
+[data-testid="stMetricValue"] {
+
+    font-size: 28px !important;
+
+    font-weight: 700 !important;
+}
+
+[data-testid="stMetricLabel"] {
+
+    font-size: 12px !important;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.6px;
+
+    color: #94a3b8 !important;
+}
+
+
+/* =========================================================
+CARDS / BLOCKS
+========================================================= */
+
+[data-testid="stHorizontalBlock"] > div {
+
+    transition: transform 0.15s ease,
+                box-shadow 0.15s ease;
+}
+
+[data-testid="stHorizontalBlock"] > div:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+}
+
+
+/* =========================================================
+GRAPH CONTAINER
+========================================================= */
+
+[data-testid="stGraphVizChart"] {
+
+    background: #020617;
+
+    border-radius: 12px;
+
+    padding: 12px;
+
+    border: 1px solid #1e293b;
 }
 
 
@@ -199,7 +318,7 @@ ALERTS
 
 
 /* =========================================================
-CODE BLOCKS / LOG DISPLAY
+CODE BLOCKS
 ========================================================= */
 
 pre,
@@ -214,6 +333,10 @@ code {
     border-radius: 8px;
 
     padding: 10px;
+
+    font-family: Consolas, monospace;
+
+    font-size: 13px;
 }
 
 
@@ -232,148 +355,7 @@ EXPANDERS
 
 
 /* =========================================================
-DROPDOWNS
-========================================================= */
-
-div[data-baseweb="select"] > div {
-
-    background-color: #ffffff !important;
-
-    border: 1px solid #cbd5e1 !important;
-
-    border-radius: 8px !important;
-}
-
-div[data-baseweb="select"] span {
-
-    color: #000000 !important;
-
-    font-weight: 500;
-}
-
-div[data-baseweb="option"] {
-
-    background-color: #ffffff !important;
-
-    color: #000000 !important;
-}
-
-div[data-baseweb="option"]:hover {
-
-    background-color: #e5e7eb !important;
-}
-
-/* =========================================================
-HERO TITLE EFFECT
-========================================================= */
-
-h1 {
-    letter-spacing: 1px;
-    text-shadow: 0 0 12px rgba(59,130,246,0.4);
-}
-
-
-/* =========================================================
-FEATURE INFO CARDS
-========================================================= */
-
-.stAlert {
-    border-radius: 10px !important;
-}
-
-
-/* =========================================================
-DASHBOARD FEATURE CARDS
-========================================================= */
-
-[data-testid="stHorizontalBlock"] > div {
-
-    transition: transform 0.15s ease,
-                box-shadow 0.15s ease;
-}
-
-[data-testid="stHorizontalBlock"] > div:hover {
-
-    transform: translateY(-4px);
-
-    box-shadow: 0 10px 25px rgba(0,0,0,0.45);
-}
-
-
-/* =========================================================
-GRAPH CONTAINER
-========================================================= */
-
-[data-testid="stGraphVizChart"] {
-
-    background: #020617;
-
-    border-radius: 12px;
-
-    padding: 12px;
-
-    border: 1px solid #1e293b;
-}
-
-
-/* =========================================================
-SIDEBAR TITLE
-========================================================= */
-
-section[data-testid="stSidebar"] h2 {
-
-    font-weight: 600;
-
-    letter-spacing: 0.5px;
-
-    border-bottom: 1px solid #1e293b;
-
-    padding-bottom: 10px;
-}
-
-
-/* =========================================================
-METRIC VALUE STYLE
-========================================================= */
-
-[data-testid="stMetricValue"] {
-
-    font-size: 28px !important;
-
-    font-weight: 700 !important;
-}
-
-
-/* =========================================================
-METRIC LABEL
-========================================================= */
-
-[data-testid="stMetricLabel"] {
-
-    font-size: 13px !important;
-
-    text-transform: uppercase;
-
-    letter-spacing: 0.6px;
-
-    color: #94a3b8 !important;
-}
-
-
-/* =========================================================
-CODE BLOCK IMPROVEMENT
-========================================================= */
-
-code {
-
-    font-family: Consolas, monospace;
-
-    font-size: 13px;
-}
-
-
-/* =========================================================
-SUBTLE APP CONTAINER SHADOW
+APP CONTAINER SHADOW
 ========================================================= */
 
 [data-testid="stAppViewContainer"] {
