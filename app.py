@@ -74,7 +74,7 @@ def hero_section():
     st.markdown(
         """
         <h1 style='text-align:center;font-size:56px'>
-        🔐 Secure Cloud Log Drive
+        Secure Cloud Log Drive
         </h1>
         """,
         unsafe_allow_html=True
@@ -194,14 +194,14 @@ def dashboard():
 # ---------------- MAIN APP ----------------
 def main_app():
 
-    st.sidebar.markdown("## 🔐 Secure Cloud Log Drive")
+    st.sidebar.markdown("## Secure Cloud Log Drive")
 
     st.sidebar.markdown(f"User: **{st.session_state.username}**")
 
     if st.session_state.is_admin:
-        st.sidebar.markdown("🛡️ Role: Administrator")
+        st.sidebar.markdown("Role: Administrator")
     else:
-        st.sidebar.markdown("👤 Role: Standard User")
+        st.sidebar.markdown("Role: Standard User")
 
     if st.sidebar.button("Sign Out"):
 
@@ -314,14 +314,14 @@ def main_app():
                 st.session_state.security.record_anomaly()
 
                 if not st.session_state.warned_user:
-                    st.warning("⚠️ Suspicious activity detected. Please slow down.")
+                    st.warning("Suspicious activity detected. Please slow down.")
                     st.session_state.warned_user = True
 
             elif risk == "HIGH":
 
                 st.session_state.security.record_anomaly()
 
-                st.error("🚨 Security policy violation. Session terminated.")
+                st.error("Security policy violation. Session terminated.")
 
                 st.session_state.activity_log.append(
                     f"{datetime.now()} - User logged out due to anomaly"
