@@ -10,7 +10,11 @@ from modules.search_index import SearchIndex
 from modules.logs import get_logs_for_user, format_log_for_display
 from modules.anomaly import AnomalyDetector
 from modules.security_state import SecurityState
-
+from modules.visualization import (
+    draw_blockchain,
+    draw_architecture,
+    draw_threat_flow
+)
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
@@ -62,14 +66,17 @@ def get_block_by_index(chain, block_index):
     return None
 
 
-# ---------------- SECURITY BANNER ----------------
+# ---------------- SECURITY STATUS ----------------
 def security_banner():
+
     level = st.session_state.security.threat_level
 
     if level == "LOW":
         st.success("🟢 System operating normally")
+
     elif level == "MEDIUM":
         st.warning("🟡 Suspicious activity detected")
+
     else:
         st.error("🔴 High-risk activity detected")
 
@@ -89,8 +96,7 @@ def hero_section():
     st.markdown(
         """
         <p style='text-align:center;font-size:20px;color:#cbd5e1'>
-        Blockchain-Based Log Storage with Real-Time Monitoring
-        and Intelligent Search
+        Blockchain-Based Log Storage • AI Threat Detection • Secure Log Search
         </p>
         """,
         unsafe_allow_html=True
@@ -99,7 +105,7 @@ def hero_section():
     st.markdown("<br>", unsafe_allow_html=True)
 
 
-# ---------------- LOGIN UI ----------------
+# ---------------- LOGIN PAGE ----------------
 def login_page():
 
     hero_section()
@@ -108,7 +114,7 @@ def login_page():
 
     with col2:
 
-        tab1, tab2 = st.tabs(["🔑 Sign In", "📝 Register"])
+        tab1, tab2 = st.tabs(["Sign In", "Register"])
 
         with tab1:
 
@@ -133,6 +139,7 @@ def login_page():
 
                 else:
                     st.error("Authentication failed")
+
 
         with tab2:
 
@@ -181,8 +188,24 @@ def dashboard():
     f1, f2, f3 = st.columns(3)
 
     f1.info("🔐 Blockchain Secured Storage")
-    f2.info("⚡ Fast Log Search")
+    f2.info("⚡ Fast Encrypted Search")
     f3.info("🧠 AI Anomaly Detection")
+
+    st.markdown("---")
+
+    st.subheader("Blockchain Visualization")
+
+    graph = draw_blockchain(st.session_state.blockchain.chain)
+
+    st.graphviz_chart(graph)
+
+    st.markdown("---")
+
+    st.subheader("System Architecture")
+
+    arch = draw_architecture()
+
+    st.graphviz_chart(arch)
 
 
 # ---------------- MAIN APP ----------------
@@ -198,9 +221,11 @@ def main_app():
         st.sidebar.markdown("👤 **Standard User**")
 
     if st.sidebar.button("Sign Out"):
+
         st.session_state.logged_in = False
         st.session_state.username = None
         st.session_state.is_admin = False
+
         st.rerun()
 
 
@@ -243,7 +268,7 @@ def main_app():
 
     elif menu == "Add Log" and not st.session_state.is_admin:
 
-        st.markdown("### ➕ Add Log Entry")
+        st.markdown("### Add Log Entry")
 
         log_data = st.text_area("Log details")
 
@@ -271,10 +296,9 @@ def main_app():
                 st.warning("Log content cannot be empty")
 
 
-    # ---- SEARCH ----
     elif menu == "Encrypted Search" and not st.session_state.is_admin:
 
-        st.markdown("### 🔍 Search Logs")
+        st.markdown("### Search Logs")
 
         query = st.text_input("Search keywords")
 
@@ -298,10 +322,9 @@ def main_app():
                 st.info("No matching logs found")
 
 
-    # ---- MY LOGS ----
     elif menu == "My Logs" and not st.session_state.is_admin:
 
-        st.markdown("### 📂 My Logs")
+        st.markdown("### My Logs")
 
         logs = get_logs_for_user(
             st.session_state.blockchain,
@@ -317,10 +340,9 @@ def main_app():
                 st.code(format_log_for_display(block))
 
 
-    # ---- INTEGRITY ----
     elif menu == "My Log Integrity" and not st.session_state.is_admin:
 
-        st.markdown("### 🔗 My Log Integrity")
+        st.markdown("### My Log Integrity")
 
         if st.session_state.blockchain.is_chain_valid():
             st.success("Blockchain integrity verified")
@@ -332,7 +354,7 @@ def main_app():
 
     elif menu == "View All Logs" and st.session_state.is_admin:
 
-        st.markdown("### 📄 All Logs")
+        st.markdown("### All Logs")
 
         for block in st.session_state.blockchain.chain:
 
@@ -348,7 +370,7 @@ Log  : {block.data}
 
     elif menu == "Blockchain Ledger" and st.session_state.is_admin:
 
-        st.markdown("### ⛓️ Blockchain Ledger")
+        st.markdown("### Blockchain Ledger")
 
         for b in st.session_state.blockchain.chain:
 
@@ -365,7 +387,7 @@ Previous Hash  : {b.previous_hash}
 
     elif menu == "Threat Overview" and st.session_state.is_admin:
 
-        st.markdown("### 🚨 Threat Overview")
+        st.markdown("### Threat Overview")
 
         st.metric("Search Count", st.session_state.security.search_count)
         st.metric("View Count", st.session_state.security.view_count)
@@ -374,36 +396,18 @@ Previous Hash  : {b.previous_hash}
 
     elif menu == "Threat Flow Visualization" and st.session_state.is_admin:
 
-        st.markdown("### 📊 Threat Flow Visualization")
+        st.markdown("### Threat Flow Visualization")
 
-        g = graphviz.Digraph()
+        graph = draw_threat_flow(
+            st.session_state.security.threat_level
+        )
 
-        g.node("User", "User Activity")
-
-        if st.session_state.security.threat_level == "LOW":
-
-            g.node("Normal", "Normal Activity")
-            g.edge("User", "Normal")
-
-        elif st.session_state.security.threat_level == "MEDIUM":
-
-            g.node("Anomaly", "Anomaly")
-            g.edge("User", "Anomaly")
-
-        else:
-
-            g.node("Anomaly", "Anomaly")
-            g.node("Abuse", "Potential Abuse")
-
-            g.edge("User", "Anomaly")
-            g.edge("Anomaly", "Abuse")
-
-        st.graphviz_chart(g)
+        st.graphviz_chart(graph)
 
 
     elif menu == "Audit Timeline":
 
-        st.markdown("### 🕒 Audit Timeline")
+        st.markdown("### Audit Timeline")
 
         st.code("\n".join(st.session_state.activity_log[-30:]))
 
